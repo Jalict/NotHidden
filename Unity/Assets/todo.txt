@@ -1,7 +1,0 @@
-custom character controller 	-
-server code 					-	
-guns							-	
-hunter jump @ knife				-	Rasmus
-hunter view						-	
-menu							-	
-multiplayer controller			-	
