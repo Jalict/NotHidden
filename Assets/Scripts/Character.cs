@@ -4,6 +4,7 @@ using System.Collections.Generic;
 public class Character : MonoBehaviour {
 	
 	// Settings
+	public string fireKey = "Fire1";
 	public string jumpKey = "Fire2";
 	public string visionKey = "Fire3";
 	public float maxEnergy = 100;
@@ -12,6 +13,7 @@ public class Character : MonoBehaviour {
 	public float jumpForce = 40;
 	public float visionCost = 30;
 	public Transform[] visions;
+	public string unitType;
 	
 	// Jumping variables
 	private Vector3 middleScreen;
@@ -95,6 +97,10 @@ public class Character : MonoBehaviour {
 			motor.SetVelocity(GetComponentInChildren<Camera>().ScreenPointToRay(middleScreen).direction*jumpForce);
 		}
 		
+		// Fire gadget
+		if(Input.GetButtonDown(fireKey)){
+			
+		}
 	}
 	void OnExternalVelocity(){
 		// This is just here to stop an error. Mind it not.
