@@ -16,6 +16,7 @@ public class Character : MonoBehaviour {
 	// Jumping variables
 	private Vector3 middleScreen;
 	private CharacterMotor motor;
+	private FPSInputController fpscon;
 	private bool hanging;
 	private bool jumping;
 	private float gravity;
@@ -30,6 +31,7 @@ public class Character : MonoBehaviour {
 		// Setup jumping variables
 		middleScreen = new Vector3(Screen.width/2,Screen.height/2,0);
 		motor = GetComponentInChildren<CharacterMotor>();
+		fpscon = GetComponentInChildren<FPSInputController>();
 		gravity = motor.movement.gravity;
 		hanging = false;
 		jumping = false;
@@ -43,6 +45,7 @@ public class Character : MonoBehaviour {
 		int i = visions.Length;
 		while(i-- > 0){
 			defaultColor.Add(visions[i].renderer.material.color);
+			visions[i].gameObject.layer = LayerMask.NameToLayer("HunterVision");
 			// TODO check if vision has hp
 		}
 	}
@@ -80,10 +83,12 @@ public class Character : MonoBehaviour {
 			motor.SetVelocity(Vector3.zero);
 			motor.inputMoveDirection = Vector3.zero;
 			motor.movement.gravity = 0;
+			fpscon.alive = 0;
 		}
 		// Jump
 		if(Input.GetButtonDown(jumpKey) && (motor.grounded || hanging) && energy >= jumpCost){
 			hanging = false;
+			fpscon.alive = 1;
 			motor.movement.gravity = gravity;
 			jumping = true;
 			energy -= jumpCost;
