@@ -10,6 +10,7 @@ public class Character : MonoBehaviour {
 	public float energyRegen = 20;
 	public float jumpCost = 20;
 	public float jumpForce = 40;
+	public float visionCost = 30;
 	public Transform[] visions;
 	
 	// Jumping variables
@@ -22,7 +23,7 @@ public class Character : MonoBehaviour {
 	
 	// Vision variables
 	private Camera cam;
-	private int defaultMask;
+	private Camera visionCam;
 	private List<Color> defaultColor;
 
 	void Start () {
@@ -35,8 +36,9 @@ public class Character : MonoBehaviour {
 		energy = maxEnergy;
 		
 		// Setup vision variables
-		cam = gameObject.GetComponentInChildren<Camera>();
-		defaultMask = cam.cullingMask;
+		cam = gameObject.GetComponentsInChildren<Camera>()[0];
+		visionCam = gameObject.GetComponentsInChildren<Camera>()[1];
+		visionCam.enabled = false;
 		defaultColor = new List<Color>();
 		int i = visions.Length;
 		while(i-- > 0){
@@ -55,16 +57,18 @@ public class Character : MonoBehaviour {
 		
 		// Switch camera mode
 		int i = visions.Length;
-		if(Input.GetButton(visionKey)){
-			if(cam.cullingMask == defaultMask){
-				cam.cullingMask = 1 << LayerMask.NameToLayer("HunterVision");
+		if(Input.GetButton(visionKey) && energy>=visionCost*Time.deltaTime){
+			energy -= visionCost*Time.deltaTime;
+			if(energy<0)energy=0;
+			if(!visionCam.enabled){
+				visionCam.enabled = true;
 				while(i-- > 0){
 					visions[i].renderer.material.color = Color.red;
 				}
 			}
 		} else {
-			if(cam.cullingMask != defaultMask){
-				cam.cullingMask = defaultMask;
+			if(visionCam.enabled){
+				visionCam.enabled = false;
 				while(i-- > 0){
 					visions[i].renderer.material.color = defaultColor[i];
 				}
