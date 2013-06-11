@@ -1,25 +1,31 @@
 using UnityEngine;
 using System.Collections.Generic;
+using System.Reflection;
+using System;
 
 [RequireComponent(typeof(CharacterMotor))]
 [RequireComponent(typeof(FPSInputController))]
 
 public class Character : MonoBehaviour {
 	
-	// Settings
+	// Key Settings
 	public string fireKey = "Fire1";
 	public string jumpKey = "Fire2";
 	public string clingKey = "Fire2";
 	public string unclingKey = "Jump";
 	public string visionKey = "Fire3";
+	public string scrollAxis = "Mouse ScrollWheel";
+	// Energy Settings
 	public float maxEnergy = 100;
 	public float energyRegen = 20;
 	public float jumpCost = 20;
-	public float jumpForce = 40;
 	public float clingCost = 25;
 	public float visionCost = 30;
+	// Other Settings
+	public float jumpForce = 40;
 	public List<Transform> visions;
 	public string unitType;
+	public List<string> weaponNames;
 	
 	// Jumping variables
 	private Vector3 middleScreen;
@@ -31,10 +37,13 @@ public class Character : MonoBehaviour {
 	private float energy;
 	
 	// Vision variables
-	private Camera cam;
 	private Camera visionCam;
 	private List<Color> defaultColor;
-
+	
+	// Weapon variables
+	private List<MonoBehaviour> weapons;
+	private int currentWeapon;
+	
 	void Start () {
 		// Setup jumping variables
 		middleScreen = new Vector3(Screen.width/2,Screen.height/2,0);
@@ -46,7 +55,6 @@ public class Character : MonoBehaviour {
 		energy = maxEnergy;
 		
 		// Setup vision variables
-		cam = gameObject.GetComponentsInChildren<Camera>()[0];
 		visionCam = gameObject.GetComponentsInChildren<Camera>()[1];
 		visionCam.enabled = false;
 		defaultColor = new List<Color>();
@@ -56,6 +64,16 @@ public class Character : MonoBehaviour {
 			visions[i].gameObject.layer = LayerMask.NameToLayer("HunterVision");
 			// TODO check if vision has hp
 		}
+		
+		// Setup weapons
+		weapons = new List<MonoBehaviour>();
+		i = weaponNames.Count;
+		while(i-- > 0){
+			weapons.Add(gameObject.AddComponent(weaponNames[i]) as MonoBehaviour);
+			weapons[weapons.Count-1].enabled = false;
+		}
+		currentWeapon = 0;
+		weapons[currentWeapon].enabled = true;
 	}
 	
 	void Update () {
@@ -106,6 +124,15 @@ public class Character : MonoBehaviour {
 			jumping = true;
 			energy -= jumpCost;
 			motor.SetVelocity(GetComponentInChildren<Camera>().ScreenPointToRay(middleScreen).direction*jumpForce);
+		}
+		
+		// Scroll gadgets
+		if(Input.GetAxis(scrollAxis) != 0 && weapons.Count > 0){
+			weapons[currentWeapon].enabled = false;
+			currentWeapon += (int)Mathf.Sign(Input.GetAxis(scrollAxis));
+			while(currentWeapon >= weapons.Count)currentWeapon-=weapons.Count;
+			while(currentWeapon < 0)currentWeapon+=weapons.Count;
+			weapons[currentWeapon].enabled = true;
 		}
 		
 		// Fire gadget
