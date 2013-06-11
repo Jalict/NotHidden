@@ -41,7 +41,7 @@ public class Character : MonoBehaviour {
 	private List<Color> defaultColor;
 	
 	// Weapon variables
-	private List<MonoBehaviour> weapons;
+	private List<Weapon> weapons;
 	private int currentWeapon;
 	
 	void Start () {
@@ -66,14 +66,14 @@ public class Character : MonoBehaviour {
 		}
 		
 		// Setup weapons
-		weapons = new List<MonoBehaviour>();
+		weapons = new List<Weapon>();
 		i = weaponNames.Count;
 		while(i-- > 0){
-			weapons.Add(gameObject.AddComponent(weaponNames[i]) as MonoBehaviour);
-			weapons[weapons.Count-1].enabled = false;
+			weapons.Add(gameObject.AddComponent(weaponNames[i]) as Weapon);
+			weapons[weapons.Count-1].Enable(false);
 		}
 		currentWeapon = 0;
-		weapons[currentWeapon].enabled = true;
+		weapons[currentWeapon].Enable(true);
 	}
 	
 	void Update () {
@@ -128,16 +128,16 @@ public class Character : MonoBehaviour {
 		
 		// Scroll gadgets
 		if(Input.GetAxis(scrollAxis) != 0 && weapons.Count > 0){
-			weapons[currentWeapon].enabled = false;
+			weapons[currentWeapon].Enable(false);
 			currentWeapon += (int)Mathf.Sign(Input.GetAxis(scrollAxis));
 			while(currentWeapon >= weapons.Count)currentWeapon-=weapons.Count;
 			while(currentWeapon < 0)currentWeapon+=weapons.Count;
-			weapons[currentWeapon].enabled = true;
+			weapons[currentWeapon].Enable(true);
 		}
 		
 		// Fire gadget
 		if(Input.GetButtonDown(fireKey)){
-			
+			BroadcastMessage("OnFire");
 		}
 		
 		// Clamp energy
