@@ -1,18 +1,24 @@
 using UnityEngine;
 using System.Collections.Generic;
 
+[RequireComponent(typeof(CharacterMotor))]
+[RequireComponent(typeof(FPSInputController))]
+
 public class Character : MonoBehaviour {
 	
 	// Settings
 	public string fireKey = "Fire1";
 	public string jumpKey = "Fire2";
+	public string clingKey = "Fire2";
+	public string unclingKey = "Jump";
 	public string visionKey = "Fire3";
 	public float maxEnergy = 100;
 	public float energyRegen = 20;
 	public float jumpCost = 20;
 	public float jumpForce = 40;
+	public float clingCost = 25;
 	public float visionCost = 30;
-	public Transform[] visions;
+	public List<Transform> visions;
 	public string unitType;
 	
 	// Jumping variables
@@ -44,7 +50,7 @@ public class Character : MonoBehaviour {
 		visionCam = gameObject.GetComponentsInChildren<Camera>()[1];
 		visionCam.enabled = false;
 		defaultColor = new List<Color>();
-		int i = visions.Length;
+		int i = visions.Count;
 		while(i-- > 0){
 			defaultColor.Add(visions[i].renderer.material.color);
 			visions[i].gameObject.layer = LayerMask.NameToLayer("HunterVision");
@@ -58,13 +64,11 @@ public class Character : MonoBehaviour {
 		
 		// Regenerate energy
 		energy += energyRegen * Time.deltaTime;
-		if(energy>maxEnergy)energy=maxEnergy;
 		
 		// Switch camera mode
-		int i = visions.Length;
+		int i = visions.Count;
 		if(Input.GetButton(visionKey) && energy>=visionCost*Time.deltaTime){
 			energy -= visionCost*Time.deltaTime;
-			if(energy<0)energy=0;
 			if(!visionCam.enabled){
 				visionCam.enabled = true;
 				while(i-- > 0){
@@ -82,10 +86,17 @@ public class Character : MonoBehaviour {
 		
 		// Cling to walls
 		if(hanging){
-			motor.SetVelocity(Vector3.zero);
-			motor.inputMoveDirection = Vector3.zero;
-			motor.movement.gravity = 0;
-			fpscon.alive = 0;
+			if(Input.GetButton(unclingKey) || energy<clingCost*Time.deltaTime){
+				hanging = false;
+				fpscon.alive = 1;
+				motor.movement.gravity = gravity;
+			} else {
+				energy -= clingCost*Time.deltaTime;
+				motor.SetVelocity(Vector3.zero);
+				motor.inputMoveDirection = Vector3.zero;
+				motor.movement.gravity = 0;
+				fpscon.alive = 0;
+			}
 		}
 		// Jump
 		if(Input.GetButtonDown(jumpKey) && (motor.grounded || hanging) && energy >= jumpCost){
@@ -101,6 +112,9 @@ public class Character : MonoBehaviour {
 		if(Input.GetButtonDown(fireKey)){
 			
 		}
+		
+		// Clamp energy
+		energy = Mathf.Clamp(energy,0,maxEnergy);
 	}
 	void OnExternalVelocity(){
 		// This is just here to stop an error. Mind it not.
@@ -110,7 +124,7 @@ public class Character : MonoBehaviour {
 		if (jumping) {
 			Vector3 dir = hit.moveDirection;
 			dir.y = Mathf.Max(0,dir.y);
-			if (dir.magnitude > 0.1) {
+			if (dir.magnitude > 0.1 && Input.GetButton(clingKey)) {
 				hanging = true;
 			}
 		}
