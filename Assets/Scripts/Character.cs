@@ -37,6 +37,7 @@ public class Character : MonoBehaviour {
 	private float energy;
 	
 	// Vision variables
+	private Camera maincam;
 	private Camera visionCam;
 	private List<Color> defaultColor;
 	
@@ -55,13 +56,14 @@ public class Character : MonoBehaviour {
 		energy = maxEnergy;
 		
 		// Setup vision variables
-		visionCam = gameObject.GetComponentsInChildren<Camera>()[1];
+		maincam = GetComponentsInChildren<Camera>()[0];
+		visionCam = GetComponentsInChildren<Camera>()[1];
 		visionCam.enabled = false;
 		defaultColor = new List<Color>();
 		int i = visions.Count;
 		while(i-- > 0){
-			defaultColor.Add(visions[i].renderer.material.color);
-			visions[i].gameObject.layer = LayerMask.NameToLayer("HunterVision");
+			defaultColor.Add(visions[i].GetComponentInChildren<Renderer>().material.color);
+			visions[i].GetComponentInChildren<Renderer>().gameObject.layer = LayerMask.NameToLayer("HunterVision");
 			// TODO check if vision has hp
 		}
 		
@@ -81,7 +83,7 @@ public class Character : MonoBehaviour {
 		Screen.lockCursor = true;
 		
 		// Regenerate energy
-		energy += energyRegen * Time.deltaTime;
+		if(!jumping)energy += energyRegen * Time.deltaTime;
 		
 		// Switch camera mode
 		int i = visions.Count;
@@ -90,14 +92,18 @@ public class Character : MonoBehaviour {
 			if(!visionCam.enabled){
 				visionCam.enabled = true;
 				while(i-- > 0){
-					visions[i].renderer.material.color = Color.red;
+					if(visions[i] == null){ // Remove vision if null
+						visions.RemoveAt(i);
+						continue;
+					}
+					visions[i].GetComponentInChildren<Renderer>().material.color = Color.red;
 				}
 			}
 		} else {
 			if(visionCam.enabled){
 				visionCam.enabled = false;
 				while(i-- > 0){
-					visions[i].renderer.material.color = defaultColor[i];
+					visions[i].GetComponentInChildren<Renderer>().material.color = defaultColor[i];
 				}
 			}
 		}
@@ -117,13 +123,13 @@ public class Character : MonoBehaviour {
 			}
 		}
 		// Jump
-		if(Input.GetButtonDown(jumpKey) && (motor.grounded || hanging) && energy >= jumpCost){
+		if(Input.GetButtonDown(jumpKey) && (motor.grounded || hanging)){
 			hanging = false;
 			fpscon.alive = 1;
 			motor.movement.gravity = gravity;
 			jumping = true;
-			energy -= jumpCost;
-			motor.SetVelocity(GetComponentInChildren<Camera>().ScreenPointToRay(middleScreen).direction*jumpForce);
+			motor.SetVelocity(maincam.ScreenPointToRay(middleScreen).direction*jumpForce*Mathf.Clamp01(energy/jumpCost));
+			energy -= Mathf.Min(jumpCost,energy);
 		}
 		
 		// Scroll gadgets

@@ -2,6 +2,8 @@ using UnityEngine;
 using System.Collections;
 
 public class Knife : Weapon {
+	private float hitDistance = 1.5f;
+	private float hitForce = 2f;
 
 	// Use this for initialization
 	void Start () {
@@ -13,7 +15,16 @@ public class Knife : Weapon {
 	
 	}
 	
-	public void OnFire() {
-		model.transform.Translate(Vector3.forward);
+	public override void OnFire() {
+		if(!enabled)return;
+		RaycastHit hit;
+		if(Physics.Raycast(cam.transform.position,cam.transform.forward,out hit,hitDistance)){
+			if(hit.transform.GetComponent<Health>() != null){
+				hit.transform.GetComponent<Health>().Damage(40);
+			}
+			if(hit.transform.GetComponent<CharacterMotor>() != null){
+				hit.transform.GetComponent<CharacterMotor>().SetVelocity(cam.transform.forward*hitForce);
+			}
+		}
 	}
 }
