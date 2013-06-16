@@ -4,14 +4,8 @@ using System.Collections;
 public class Health : MonoBehaviour {
 	public float HP = 100;
 
-	// Use this for initialization
 	void Start () {
-	
-	}
-	
-	// Update is called once per frame
-	void Update () {
-	
+		gameObject.tag = "Unit";
 	}
 	
 	public void Damage(float dmg){

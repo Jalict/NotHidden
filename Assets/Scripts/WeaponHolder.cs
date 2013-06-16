@@ -40,5 +40,8 @@ public class WeaponHolder : MonoBehaviour {
 		if(Input.GetButtonDown(fireKey)){
 			BroadcastMessage("OnFire");
 		}
+		if(Input.GetButton(fireKey)){
+			BroadcastMessage("OnFiring");
+		}
 	}
 }
