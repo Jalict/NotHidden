@@ -10,6 +10,8 @@ public class WeaponHolder : MonoBehaviour {
 	public List<string> weaponNames;
 	private List<Weapon> weapons;
 	private int currentWeapon;
+	private KeyCode[] numbers = {KeyCode.Alpha1,KeyCode.Alpha2,KeyCode.Alpha3,KeyCode.Alpha4,KeyCode.Alpha5,
+								KeyCode.Alpha6,KeyCode.Alpha7,KeyCode.Alpha8,KeyCode.Alpha9,KeyCode.Alpha0};
 
 	// Use this for initialization
 	void Start () {
@@ -26,8 +28,18 @@ public class WeaponHolder : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+		// Switch weapon on number keys
+		for(int i = 0; i<numbers.Length; i++){
+			if(Input.GetKeyDown(numbers[i])){
+				if(weapons.Count > i){
+					weapons[currentWeapon].Enable(false);
+					currentWeapon = i;
+					weapons[currentWeapon].Enable(true);
+				}
+			}
+		}
 		
-		// Scroll gadgets
+		// Scroll weapons
 		if(Input.GetAxis(scrollAxis) != 0 && weapons.Count > 0){
 			weapons[currentWeapon].Enable(false);
 			currentWeapon += (int)Mathf.Sign(Input.GetAxis(scrollAxis));
