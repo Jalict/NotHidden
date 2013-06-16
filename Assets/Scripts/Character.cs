@@ -9,12 +9,10 @@ using System;
 public class Character : MonoBehaviour {
 	
 	// Key Settings
-	public string fireKey = "Fire1";
 	public string jumpKey = "Fire2";
 	public string clingKey = "Fire2";
 	public string unclingKey = "Jump";
 	public string visionKey = "Fire3";
-	public string scrollAxis = "Mouse ScrollWheel";
 	// Energy Settings
 	public float maxEnergy = 100;
 	public float energyRegen = 20;
@@ -24,8 +22,6 @@ public class Character : MonoBehaviour {
 	// Other Settings
 	public float jumpForce = 40;
 	public List<Transform> visions;
-	public string unitType;
-	public List<string> weaponNames;
 	
 	// Jumping variables
 	private Vector3 middleScreen;
@@ -40,10 +36,6 @@ public class Character : MonoBehaviour {
 	private Camera maincam;
 	private Camera visionCam;
 	private List<Color> defaultColor;
-	
-	// Weapon variables
-	private List<Weapon> weapons;
-	private int currentWeapon;
 	
 	void Start () {
 		// Setup jumping variables
@@ -63,19 +55,9 @@ public class Character : MonoBehaviour {
 		int i = visions.Count;
 		while(i-- > 0){
 			defaultColor.Add(visions[i].GetComponentInChildren<Renderer>().material.color);
-			visions[i].GetComponentInChildren<Renderer>().gameObject.layer = LayerMask.NameToLayer("HunterVision");
+			visions[i].GetComponentInChildren<Renderer>().gameObject.layer = LayerMask.NameToLayer("Enemies");
 			// TODO check if vision has hp
 		}
-		
-		// Setup weapons
-		weapons = new List<Weapon>();
-		i = weaponNames.Count;
-		while(i-- > 0){
-			weapons.Add(gameObject.AddComponent(weaponNames[i]) as Weapon);
-			weapons[weapons.Count-1].Enable(false);
-		}
-		currentWeapon = 0;
-		weapons[currentWeapon].Enable(true);
 	}
 	
 	void Update () {
@@ -130,20 +112,6 @@ public class Character : MonoBehaviour {
 			jumping = true;
 			motor.SetVelocity(maincam.ScreenPointToRay(middleScreen).direction*jumpForce*Mathf.Clamp01(energy/jumpCost));
 			energy -= Mathf.Min(jumpCost,energy);
-		}
-		
-		// Scroll gadgets
-		if(Input.GetAxis(scrollAxis) != 0 && weapons.Count > 0){
-			weapons[currentWeapon].Enable(false);
-			currentWeapon += (int)Mathf.Sign(Input.GetAxis(scrollAxis));
-			while(currentWeapon >= weapons.Count)currentWeapon-=weapons.Count;
-			while(currentWeapon < 0)currentWeapon+=weapons.Count;
-			weapons[currentWeapon].Enable(true);
-		}
-		
-		// Fire gadget
-		if(Input.GetButtonDown(fireKey)){
-			BroadcastMessage("OnFire");
 		}
 		
 		// Clamp energy
