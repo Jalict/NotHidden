@@ -20,9 +20,9 @@ public class GrenadeObj : MonoBehaviour {
 				if(Physics.Raycast(transform.position,unit.transform.position-transform.position,out hit,explosionRadius)){
 					if(hit.transform == unit.transform){
 						unit.GetComponentInChildren<Health>().Damage(damage);
-					}
-					if(unit.GetComponentInChildren<CharacterMotor>() != null){
-						unit.GetComponentInChildren<CharacterMotor>().SetVelocity((unit.transform.position-transform.position).normalized*explosionForce);
+						if(unit.GetComponentInChildren<CharacterMotor>() != null){
+							unit.GetComponentInChildren<CharacterMotor>().SetVelocity((unit.transform.position-transform.position).normalized*explosionForce);
+						}
 					}
 				}
 			}

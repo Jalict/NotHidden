@@ -11,6 +11,6 @@ public class BaseGun : Weapon {
 		if(!enabled)return;
 		GameObject bullet = Instantiate(Resources.Load("Prefabs/Bullet")) as GameObject;
 		bullet.transform.position = cam.transform.position+cam.transform.forward*1+Vector3.down*0.5f;
-		bullet.GetComponentInChildren<Bullet>().move = cam.transform.forward*500;
+		bullet.GetComponentInChildren<Bullet>().move = cam.transform.forward*10;
 	}
 }

@@ -6,7 +6,7 @@ public class Grenade : Weapon {
 
 	void Start () {
 		ammo = 3;
-		LoadModel("Models/Weapons/Hunter/pipebombfab",new Vector3(0.5f,-0.25f,0.5f),Vector3.up,0.05f);
+		LoadModel("Prefabs/pipebomb",new Vector3(0.5f,-0.25f,0.5f),Vector3.up,0.1f);
 	}
 	
 	public override void OnFire(){
