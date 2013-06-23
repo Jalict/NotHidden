@@ -29,7 +29,7 @@ public class BaseGun : Weapon {
 		}
 	}
 	
-	void OnFiring () { // TODO change to "fire" and move ammo check to weapon class
+	public override void OnFiring () { // TODO change to "fire" and move ammo check to weapon class
 		if(!enabled)return;
 		if(timer<=0){
 			if(ammo>0){
@@ -42,7 +42,7 @@ public class BaseGun : Weapon {
 				bullet.GetComponentInChildren<Bullet>().move = dir*muzzleSpeed;
 				bullet.GetComponentInChildren<Bullet>().damage = 10;
 				
-				cam.transform.Rotate(recoil,0,0);
+				cam.transform.Rotate(-recoil,0,0);
 				if(!(fireTime>0))fireTime = 1/fireRate;
 				timer += fireTime;
 				ammo -= 1;

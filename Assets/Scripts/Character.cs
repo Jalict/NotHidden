@@ -22,6 +22,7 @@ public class Character : MonoBehaviour {
 	// Other Settings
 	public float jumpForce = 40;
 	public List<Transform> visions;
+	new public bool active = true;
 	
 	// Jumping variables
 	private Vector3 middleScreen;
@@ -52,8 +53,7 @@ public class Character : MonoBehaviour {
 		visionCam = GetComponentsInChildren<Camera>()[1];
 		visionCam.enabled = false;
 		defaultColor = new List<Color>();
-		int i = visions.Count;
-		while(i-- > 0){
+		for(int i = 0; i<visions.Count; i++){
 			defaultColor.Add(visions[i].GetComponentInChildren<Renderer>().material.color);
 			visions[i].GetComponentInChildren<Renderer>().gameObject.layer = LayerMask.NameToLayer("Enemies");
 			// TODO check if vision has hp
@@ -61,57 +61,57 @@ public class Character : MonoBehaviour {
 	}
 	
 	void Update () {
-		// Keep locking the cursor
-		Screen.lockCursor = true;
-		
 		// Regenerate energy
 		if(motor.grounded)energy += energyRegen * Time.deltaTime;
-		
-		// Switch camera mode
-		int i = visions.Count;
-		if(Input.GetButton(visionKey) && energy>=visionCost*Time.deltaTime && motor.movement.velocity.magnitude==0){
-			energy -= visionCost*Time.deltaTime;
-			if(!visionCam.enabled){
-				visionCam.enabled = true;
-				while(i-- > 0){
-					if(visions[i] == null){ // Remove vision if null
-						visions.RemoveAt(i);
-						continue;
-					}
-					visions[i].GetComponentInChildren<Renderer>().material.color = Color.red;
-				}
-			}
-		} else {
-			if(visionCam.enabled){
-				visionCam.enabled = false;
-				while(i-- > 0){
-					visions[i].GetComponentInChildren<Renderer>().material.color = defaultColor[i];
-				}
-			}
-		}
 		
 		// Cling to walls
 		if(hanging){
 			if(Input.GetButton(unclingKey) || energy<clingCost*Time.deltaTime){
 				hanging = false;
-				fpscon.alive = 1;
+				motor.SetControllable(true);
 				motor.movement.gravity = gravity;
 			} else {
 				energy -= clingCost*Time.deltaTime;
 				motor.SetVelocity(Vector3.zero);
 				motor.inputMoveDirection = Vector3.zero;
 				motor.movement.gravity = 0;
-				fpscon.alive = 0;
+				motor.SetControllable(false);
 			}
 		}
-		// Jump
-		if(Input.GetButtonDown(jumpKey) && (motor.grounded || hanging)){
-			hanging = false;
-			fpscon.alive = 1;
-			motor.movement.gravity = gravity;
-			jumping = true;
-			motor.SetVelocity(maincam.ScreenPointToRay(middleScreen).direction*jumpForce*Mathf.Clamp01(energy/jumpCost));
-			energy -= Mathf.Min(jumpCost,energy);
+		
+		if(active){
+			// Jump
+			if(Input.GetButtonDown(jumpKey) && (motor.grounded || hanging)){
+				hanging = false;
+				motor.SetControllable(true);
+				motor.movement.gravity = gravity;
+				jumping = true;
+				motor.SetVelocity(maincam.ScreenPointToRay(middleScreen).direction*jumpForce*Mathf.Clamp01(energy/jumpCost));
+				energy -= Mathf.Min(jumpCost,energy);
+			}
+			
+			// Switch camera mode
+			int i = visions.Count;
+			if(Input.GetButton(visionKey) && energy>=visionCost*Time.deltaTime && motor.movement.velocity.magnitude==0){
+				energy -= visionCost*Time.deltaTime;
+				if(!visionCam.enabled){
+					visionCam.enabled = true;
+					while(i-- > 0){
+						if(visions[i] == null){ // Remove vision if null
+							visions.RemoveAt(i);
+							continue;
+						}
+						visions[i].GetComponentInChildren<Renderer>().material.color = Color.red;
+					}
+				}
+			} else {
+				if(visionCam.enabled){
+					visionCam.enabled = false;
+					while(i-- > 0){
+						visions[i].GetComponentInChildren<Renderer>().material.color = defaultColor[i];
+					}
+				}
+			}
 		}
 		
 		// Clamp energy

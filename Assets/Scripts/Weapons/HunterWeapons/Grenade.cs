@@ -8,7 +8,7 @@ public class Grenade : Weapon {
 		ammo = 3;
 		maxAmmo = 3;
 		removeOnEmpty = true;
-		LoadModel("Prefabs/pipebomb",new Vector3(0.5f,-0.25f,0.5f),Vector3.up,1f);
+		LoadModel("Prefabs/Models/pipebomb",new Vector3(0.5f,-0.25f,0.5f),Vector3.up,1f);
 	}
 	
 	public override void OnFire(){
