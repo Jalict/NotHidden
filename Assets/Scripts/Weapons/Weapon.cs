@@ -4,7 +4,9 @@ using System.Collections;
 public class Weapon : MonoBehaviour {
 	protected GameObject model;
 	protected Camera cam;
-	protected int ammo = -1;
+	internal int ammo = -1;
+	internal int maxAmmo = -1;
+	protected bool removeOnEmpty = false;
 	protected float damage = 0;
 	
 	protected void LoadModel(string name, Vector3 pos, Vector3 rot, float scale) {
@@ -24,8 +26,18 @@ public class Weapon : MonoBehaviour {
 		enabled = enable;
 	}
 	
+	void Update(){
+		if(ammo==0 && removeOnEmpty){
+			Destroy(model);
+			Destroy(this);
+		}
+	}
 	public virtual void OnFire(){
 	}
 	public virtual void OnFiring(){
+	}
+	
+	public bool empty {
+		get { return ammo==0; }
 	}
 }

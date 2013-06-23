@@ -65,11 +65,11 @@ public class Character : MonoBehaviour {
 		Screen.lockCursor = true;
 		
 		// Regenerate energy
-		if(!jumping)energy += energyRegen * Time.deltaTime;
+		if(motor.grounded)energy += energyRegen * Time.deltaTime;
 		
 		// Switch camera mode
 		int i = visions.Count;
-		if(Input.GetButton(visionKey) && energy>=visionCost*Time.deltaTime){
+		if(Input.GetButton(visionKey) && energy>=visionCost*Time.deltaTime && motor.movement.velocity.magnitude==0){
 			energy -= visionCost*Time.deltaTime;
 			if(!visionCam.enabled){
 				visionCam.enabled = true;

@@ -2,8 +2,9 @@ using UnityEngine;
 using System.Collections;
 
 public class Bullet : MonoBehaviour {
-	public Vector3 move = Vector3.zero;
+	internal Vector3 move = Vector3.zero;
 	internal float damage = 0;
+	internal float range = 100; 
 	
 	void Start () {
 	
@@ -18,5 +19,9 @@ public class Bullet : MonoBehaviour {
 			Destroy(gameObject);
 		}
 		transform.position += move * Time.deltaTime;
+		range -= move.magnitude * Time.deltaTime;
+		if(range<=0){
+			Destroy(gameObject);
+		}
 	}
 }
