@@ -3,6 +3,7 @@ using System.Collections;
 
 public class Health : MonoBehaviour {
 	public float HP = 100;
+	public float maxHP = 100;
 
 	void Start () {
 		gameObject.tag = "Unit";

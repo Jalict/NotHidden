@@ -30,7 +30,7 @@ public class Character : MonoBehaviour {
 	private bool hanging;
 	private bool jumping;
 	private float gravity;
-	private float energy;
+	internal float energy;
 	
 	// Vision variables
 	private Camera maincam;
@@ -134,7 +134,7 @@ public class Character : MonoBehaviour {
 	void OnGUI() {
 		// Draw energy bar
 		// TODO prettier energy bar
-		GUI.Box(new Rect(10,Screen.height-30,200+12,20),"");
-		GUI.Box(new Rect(10,Screen.height-30,(energy/maxEnergy)*200+12,20),"");
+		//GUI.Box(new Rect(10,Screen.height-30,200+12,20),"");
+		//GUI.Box(new Rect(10,Screen.height-30,(energy/maxEnergy)*200+12,20),"");
 	}
 }
