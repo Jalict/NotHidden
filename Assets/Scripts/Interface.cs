@@ -11,12 +11,12 @@ public class Interface : MonoBehaviour {
 	private List<Transform> magbar;
 	private Transform crosshair;
 	
-	private Character cha;
+	private Hunter cha;
 	private Health hea;
 	private WeaponHolder wep;
 
 	public void Init () {
-		if(user)cha = user.GetComponentInChildren<Character>();
+		if(user)cha = user.GetComponentInChildren<Hunter>();
 		if(user)hea = user.GetComponentInChildren<Health>();
 		if(user)wep = user.GetComponentInChildren<WeaponHolder>();
 		

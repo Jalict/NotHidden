@@ -6,7 +6,7 @@ using System;
 [RequireComponent(typeof(CharacterMotor))]
 [RequireComponent(typeof(FPSInputController))]
 
-public class Character : MonoBehaviour {
+public class Hunter : MonoBehaviour {
 	
 	// Key Settings
 	public string jumpKey = "Fire2";
@@ -54,7 +54,6 @@ public class Character : MonoBehaviour {
 		for(int i = 0; i<visions.Count; i++){
 			defaultColor.Add(visions[i].GetComponentInChildren<Renderer>().material.color);
 			visions[i].GetComponentInChildren<Renderer>().gameObject.layer = LayerMask.NameToLayer("Enemies");
-			// TODO check if vision has hp
 		}
 	}
 	
@@ -99,7 +98,8 @@ public class Character : MonoBehaviour {
 							visions.RemoveAt(i);
 							continue;
 						}
-						visions[i].GetComponentInChildren<Renderer>().material.color = Color.red;
+						float hp = 0;
+						visions[i].GetComponentInChildren<Renderer>().material.color = Color.red*(hp) + Color.green*(1-hp);
 					}
 				}
 			} else {
