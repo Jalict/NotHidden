@@ -20,7 +20,7 @@ public class Interface : MonoBehaviour {
 		if(user)hea = user.GetComponentInChildren<Health>();
 		if(user)wep = user.GetComponentInChildren<WeaponHolder>();
 		
-		crosshair = MakeCube(new Vector3(0,0,10),new Vector3(0.1f,0.1f,0.1f),Color.black);
+		MakeCube(new Vector3(0,0,10),new Vector3(0.1f,0.1f,0.1f),Color.black);
 		
 		jumpbar = new List<Transform>();
 		jumpbar.Add(MakeCube(new Vector3(-14,-9.6f,21),new Vector3(8.2f,1.2f,1),Color.black));

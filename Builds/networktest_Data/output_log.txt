@@ -1,0 +1,36 @@
+Initialize engine version: 4.1.5f1 (ed5ea3281df6)
+GfxDevice: creating device client; threaded=1
+Direct3D:
+    Version:  Direct3D 9.0c [nvd3dum.dll 9.18.13.1422]
+    Renderer: NVIDIA GeForce GTX 560 
+    Vendor:   NVIDIA
+    VRAM:     978 MB (via DXGI)
+    Caps:     Shader=30 DepthRT=1 NativeDepth=1 NativeShadow=1 DF16=0 DF24=0 INTZ=1 RAWZ=0 NULL=1 RESZ=0 SlowINTZ=0
+Begin MonoManager ReloadAssembly
+Platform assembly: C:\Users\Dyhr\Projects\NotHidden\Builds\networktest_Data\Managed\UnityEngine.dll (this message is harmless)
+Loading C:\Users\Dyhr\Projects\NotHidden\Builds\networktest_Data\Managed\UnityEngine.dll into Unity Child Domain
+Platform assembly: C:\Users\Dyhr\Projects\NotHidden\Builds\networktest_Data\Managed\Assembly-CSharp-firstpass.dll (this message is harmless)
+Loading C:\Users\Dyhr\Projects\NotHidden\Builds\networktest_Data\Managed\Assembly-CSharp-firstpass.dll into Unity Child Domain
+Platform assembly: C:\Users\Dyhr\Projects\NotHidden\Builds\networktest_Data\Managed\Assembly-CSharp.dll (this message is harmless)
+Loading C:\Users\Dyhr\Projects\NotHidden\Builds\networktest_Data\Managed\Assembly-CSharp.dll into Unity Child Domain
+Platform assembly: C:\Users\Dyhr\Projects\NotHidden\Builds\networktest_Data\Managed\Assembly-UnityScript-firstpass.dll (this message is harmless)
+Loading C:\Users\Dyhr\Projects\NotHidden\Builds\networktest_Data\Managed\Assembly-UnityScript-firstpass.dll into Unity Child Domain
+- Completed reload, in  0.079 seconds
+desktop: 1920x1080 60Hz; virtual: 3200x1143 at 0,0
+<RI> Initializing input.
+<RI> Input initialized.
+System memory in use before: 7.4 MB.
+Unloading 4 Unused Serialized files (Serialized files now loaded: 0 / Dirty serialized files: 0)
+System memory in use after: 7.1 MB.
+
+Unloading 10 unused Assets to reduce memory usage. Loaded Objects now: 299.
+Total: 1.835881 ms (FindLiveObjects: 0.017724 ms CreateObjectMapping: 0.021815 ms MarkObjects: 0.232808 ms  DeleteObjects: 0.023860 ms)
+
+Level was loaded
+UnityEngine.Debug:Internal_Log(Int32, String, Object)
+UnityEngine.Debug:Log(Object)
+GameManager:OnLevelWasLoaded(Int32) (at C:\Users\Dyhr\Projects\NotHidden\Assets\Scripts\GameManager.cs:52)
+ 
+(Filename: C Line: 0)
+
+Platform assembly: C:\Users\Dyhr\Projects\NotHidden\Builds\networktest_Data\Managed\Boo.Lang.dll (this message is harmless)
