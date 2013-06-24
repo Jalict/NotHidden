@@ -66,8 +66,14 @@ public class Interface : MonoBehaviour {
 				healthbar[0].localScale = Vector3.zero;
 			}
 			if(wep){
-				ammobar[1].localScale = new Vector3(8*(wep.ammo/wep.maxAmmo),1,1);
-				ammobar[1].localPosition = new Vector3(14+(4*(1-(wep.ammo/wep.maxAmmo))),-11,20);
+				if(wep.maxAmmo>0){
+					ammobar[1].localScale = new Vector3(8*(wep.ammo/wep.maxAmmo),1,1);
+					ammobar[1].localPosition = new Vector3(14+(4*(1-(wep.ammo/wep.maxAmmo))),-11,20);
+					ammobar[0].localScale = new Vector3(8.2f,1.2f,1);
+				} else {
+					ammobar[1].localScale = Vector3.zero;
+					ammobar[0].localScale = Vector3.zero;
+				}
 				if(wep.maxMags>0){
 					magbar[1].localScale = new Vector3(8*(wep.mags/wep.maxMags),1,1);
 					magbar[1].localPosition = new Vector3(14+(4*(1-(wep.mags/wep.maxMags))),-9.6f,20);

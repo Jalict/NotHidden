@@ -27,7 +27,6 @@ public class Character : MonoBehaviour {
 	// Jumping variables
 	private Vector3 middleScreen;
 	private CharacterMotor motor;
-	private FPSInputController fpscon;
 	private bool hanging;
 	private bool jumping;
 	private float gravity;
@@ -42,7 +41,6 @@ public class Character : MonoBehaviour {
 		// Setup jumping variables
 		middleScreen = new Vector3(Screen.width/2,Screen.height/2,0);
 		motor = GetComponentInChildren<CharacterMotor>();
-		fpscon = GetComponentInChildren<FPSInputController>();
 		gravity = motor.movement.gravity;
 		hanging = false;
 		jumping = false;
@@ -130,11 +128,5 @@ public class Character : MonoBehaviour {
 			}
 		}
 		jumping = false;
-	}
-	void OnGUI() {
-		// Draw energy bar
-		// TODO prettier energy bar
-		//GUI.Box(new Rect(10,Screen.height-30,200+12,20),"");
-		//GUI.Box(new Rect(10,Screen.height-30,(energy/maxEnergy)*200+12,20),"");
 	}
 }

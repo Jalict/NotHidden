@@ -71,10 +71,10 @@ public class WeaponHolder : MonoBehaviour {
 		}
 	}
 	public float maxAmmo{
-		get { return weapons[currentWeapon].maxAmmo; }
+		get { return (weapons[currentWeapon] != null)?weapons[currentWeapon].maxAmmo:0; }
 	}
 	public float ammo{
-		get { return weapons[currentWeapon].ammo; }
+		get { return (weapons[currentWeapon] != null)?weapons[currentWeapon].ammo:0; }
 	}
 	public float maxMags{
 		get { return (weapons[currentWeapon] is BaseGun)?(weapons[currentWeapon] as BaseGun).maxMags:0; }

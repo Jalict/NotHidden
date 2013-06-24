@@ -1,0 +1,58 @@
+using UnityEngine;
+using System.Collections;
+
+public class MainMenu : MonoBehaviour {
+	
+	private string ports = "24024";
+	private int port = 24024;
+	private string maxps = "16";
+	private int maxp = 16;
+	private string password = "";
+	private string ip = "0.0.0.0";
+
+	void Start () {
+	
+	}
+	
+	void Update () {
+	
+	}
+	void OnGUI () {
+		// Start Server
+		maxps = GUI.TextField(new Rect(130,20,22,20),maxps,2);
+		int.TryParse(maxps,out maxp);
+		maxps = maxp>0?maxp.ToString():"";
+		
+		ports = GUI.TextField(new Rect(155,20,42,20),ports,5);
+		int.TryParse(ports,out port);
+		ports = port>0?port.ToString():"";
+		
+		password = GUI.TextField(new Rect(300,20,168,20),password,16);
+		
+		if(GUI.Button(new Rect(20,15,100,30),"Start Server")){
+			if(port > 0){
+				Application.LoadLevelAdditive("test01");
+				
+				Network.incomingPassword = password;
+				Network.InitializeServer(maxp,port,!Network.HavePublicAddress());
+				
+				Destroy(gameObject);
+			}
+		}
+		
+		
+		// Join Server
+		
+		ports = GUI.TextField(new Rect(237,70,42,20),ports,5);
+		int.TryParse(ports,out port);
+		ports = port>0?port.ToString():"";
+		
+		ip = GUI.TextField(new Rect(130,70,104,20),ip,15);
+		
+		password = GUI.TextField(new Rect(300,70,168,20),password,16);
+		
+		if(GUI.Button(new Rect(20,65,100,30),"Join Server")){
+			Network.Connect(ip,port,password);
+		}
+	}
+}
