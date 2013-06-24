@@ -26,7 +26,7 @@ public class GrenadeObj : MonoBehaviour {
 					}
 				}
 			}
-			GameObject explosion = Instantiate(Resources.Load("Prefabs/Explosion")) as GameObject;
+			GameObject explosion = Instantiate(Resources.Load("Prefabs/Effects/Explosion")) as GameObject;
 			explosion.transform.position = transform.position;
 			Destroy(explosion,explosion.GetComponentInChildren<ParticleSystem>().duration);
 			Destroy(gameObject);

@@ -33,7 +33,7 @@ public class BaseGun : Weapon {
 		if(!enabled)return;
 		if(timer<=0){
 			if(ammo>0){
-				GameObject bullet = Instantiate(Resources.Load("Prefabs/Bullet")) as GameObject;
+				GameObject bullet = Instantiate(Resources.Load("Prefabs/Effects/Bullet")) as GameObject;
 				bullet.transform.position = cam.transform.position+cam.transform.right*0.5f-cam.transform.up*0.25f;
 				
 				Vector3 dir = cam.transform.forward;
