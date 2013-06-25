@@ -10,6 +10,7 @@ public class WeaponHolder : MonoBehaviour {
 	public List<string> weaponNames;
 	private List<Weapon> weapons;
 	private int currentWeapon;
+	private bool ready = false;
 	private KeyCode[] numbers = {KeyCode.Alpha1,KeyCode.Alpha2,KeyCode.Alpha3,KeyCode.Alpha4,KeyCode.Alpha5,
 								KeyCode.Alpha6,KeyCode.Alpha7,KeyCode.Alpha8,KeyCode.Alpha9,KeyCode.Alpha0};
 
@@ -23,6 +24,7 @@ public class WeaponHolder : MonoBehaviour {
 		}
 		currentWeapon = 0;
 		weapons[currentWeapon].Enable(true);
+		ready = true;
 	}
 	
 	// Update is called once per frame
@@ -71,15 +73,15 @@ public class WeaponHolder : MonoBehaviour {
 		}
 	}
 	public float maxAmmo{
-		get { return (weapons[currentWeapon] != null)?weapons[currentWeapon].maxAmmo:0; }
+		get { return ready?(weapons[currentWeapon] != null)?weapons[currentWeapon].maxAmmo:0:0; }
 	}
 	public float ammo{
-		get { return (weapons[currentWeapon] != null)?weapons[currentWeapon].ammo:0; }
+		get { return ready?(weapons[currentWeapon] != null)?weapons[currentWeapon].ammo:0:0; }
 	}
 	public float maxMags{
-		get { return (weapons[currentWeapon] is BaseGun)?(weapons[currentWeapon] as BaseGun).maxMags:0; }
+		get { return ready?(weapons[currentWeapon] is BaseGun)?(weapons[currentWeapon] as BaseGun).maxMags:0:0; }
 	}
 	public float mags{
-		get { return (weapons[currentWeapon] is BaseGun)?(weapons[currentWeapon] as BaseGun).mags:0; }
+		get { return ready?(weapons[currentWeapon] is BaseGun)?(weapons[currentWeapon] as BaseGun).mags:0:0; }
 	}
 }
