@@ -4,7 +4,6 @@ using System.Reflection;
 using System;
 
 [RequireComponent(typeof(CharacterMotor))]
-[RequireComponent(typeof(FPSInputController))]
 
 public class Hunter : MonoBehaviour {
 	

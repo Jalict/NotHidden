@@ -9,11 +9,11 @@ FBXHeaderExtension:  {
 	CreationTimeStamp:  {
 		Version: 1000
 		Year: 2013
-		Month: 06
-		Day: 29
-		Hour: 08
-		Minute: 37
-		Second: 27
+		Month: 07
+		Day: 08
+		Hour: 12
+		Minute: 45
+		Second: 19
 		Millisecond: 0
 	}
 	Creator: "FBX SDK/FBX Plugins build 20070228"
@@ -21,7 +21,7 @@ FBXHeaderExtension:  {
 		FlagPLE: 0
 	}
 }
-CreationTime: "2013-06-29 08:37:27:000"
+CreationTime: "2013-07-08 12:45:19:000"
 Creator: "Blender version 2.67 (sub 0)"
 
 ; Object definitions
@@ -2048,7 +2048,7 @@ Objects:  {
 		AudioColor: 0,1,0
 		CameraOrthoZoom: 1
 	}
-	Material: "Material::None__Untitled", "" {
+	Material: "Material::None__knife_png", "" {
 		Version: 102
 		ShadingModel: "phong"
 		MultiLayer: 0
@@ -2078,14 +2078,14 @@ Objects:  {
 			Property: "Reflectivity", "double", "",0
 		}
 	}
-	Video: "Video::Untitled", "Clip" {
+	Video: "Video::knife_png", "Clip" {
 		Type: "Clip"
 		Properties60:  {
 			Property: "FrameRate", "double", "",0
 			Property: "LastFrame", "int", "",0
 			Property: "Width", "int", "",0
 			Property: "Height", "int", "",0
-			Property: "Path", "charptr", "", "knife_normal.png"
+			Property: "Path", "charptr", "", "knife.png"
 			Property: "StartFrame", "int", "",0
 			Property: "StopFrame", "int", "",0
 			Property: "PlaySpeed", "double", "",1
@@ -2096,13 +2096,13 @@ Objects:  {
 			Property: "AccessMode", "enum", "",0
 		}
 		UseMipMap: 0
-		Filename: "knife_normal.png"
-		RelativeFilename: "knife_normal.png"
+		Filename: "knife.png"
+		RelativeFilename: "C:\Users\Dyhr\Projects\NotHidden\Blender\Textures\knife.png"
 	}
-	Texture: "Texture::Untitled", "TextureVideoClip" {
+	Texture: "Texture::knife_png", "TextureVideoClip" {
 		Type: "TextureVideoClip"
 		Version: 202
-		TextureName: "Texture::Untitled"
+		TextureName: "Texture::knife_png"
 		Properties60:  {
 			Property: "Translation", "Vector", "A+",0,0,0
 			Property: "Rotation", "Vector", "A+",0,0,0
@@ -2120,9 +2120,9 @@ Objects:  {
 			Property: "TextureScalingPivot", "Vector3D", "",0,0,0
 			Property: "VideoProperty", "object", ""
 		}
-		Media: "Video::Untitled"
-		FileName: "knife_normal.png"
-		RelativeFilename: "knife_normal.png"
+		Media: "Video::knife_png"
+		FileName: "knife.png"
+		RelativeFilename: "C:\Users\Dyhr\Projects\NotHidden\Blender\Textures\knife.png"
 		ModelUVTranslation: 0,0
 		ModelUVScaling: 1,1
 		Texture_Alpha_Source: "None"
@@ -2175,11 +2175,11 @@ Relations:  {
 	}
 	Model: "Model::Camera Switcher", "CameraSwitcher" {
 	}
-	Material: "Material::None__Untitled", "" {
+	Material: "Material::None__knife_png", "" {
 	}
-	Texture: "Texture::Untitled", "TextureVideoClip" {
+	Texture: "Texture::knife_png", "TextureVideoClip" {
 	}
-	Video: "Video::Untitled", "Clip" {
+	Video: "Video::knife_png", "Clip" {
 	}
 }
 
@@ -2188,9 +2188,9 @@ Relations:  {
 
 Connections:  {
 	Connect: "OO", "Model::knife_low", "Model::Scene"
-	Connect: "OO", "Material::None__Untitled", "Model::knife_low"
-	Connect: "OO", "Texture::Untitled", "Model::knife_low"
-	Connect: "OO", "Video::Untitled", "Texture::Untitled"
+	Connect: "OO", "Material::None__knife_png", "Model::knife_low"
+	Connect: "OO", "Texture::knife_png", "Model::knife_low"
+	Connect: "OO", "Video::knife_png", "Texture::knife_png"
 }
 ;Takes and animation section
 ;----------------------------------------------------

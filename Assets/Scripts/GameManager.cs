@@ -12,40 +12,46 @@ public class GameManager : MonoBehaviour {
 	
 	private List<string> inputNames;
 	private List<float> inputData;
+	private MemoryStream stream;
+	private BinaryFormatter format;
 	
 	void Start () {
 		players = new Hashtable(Network.maxConnections);
+		
 		inputNames = new List<string>();
 		inputData = new List<float>();
+		stream = new MemoryStream();
+		format = new BinaryFormatter();
 	}
 	
 	void Update () {
 		if(started){
 			Screen.lockCursor = !paused;
-			if(Network.isServer){
+			if(Network.isServer){ // Server Side
 				if(!paused){
 					UpdateInput(ref user.GetComponent<Controller>().input);
 				} else {
 					ResetInput(ref user.GetComponent<Controller>().input);
 				}
-			} else if(Network.isClient){
+			} else { // Client Side
 				// Get Input Data
 				CheckInput();
 				
 				// Merge Input Data
-				string[] data = new string[inputNames.Count+inputData.Count];
+				/*string[] data = new string[inputNames.Count+inputData.Count];
 				inputNames.CopyTo(data,0);
-				inputData.ConvertAll<string>(FloatToString).CopyTo(data,inputNames.Count);
+				inputData.CopyTo(data,inputNames.Count);
+				Debug.LogError(data[inputNames.Count]);*/
 				
 				// Convert To Byte Array
-				MemoryStream stream = new MemoryStream();
-				BinaryFormatter format = new BinaryFormatter();
-				format.Serialize(stream,data);
+				format.Serialize(stream,inputNames.ToArray());
+				format.Serialize(stream,inputData.ToArray());
 				
 				// Send Data
-				networkView.RPC("GetUserInput", RPCMode.Server, Network.player, stream.ToArray()); // TODO make player watchers instead
+				networkView.RPC("GetUserInput", RPCMode.Server, Network.player, stream.ToArray()); // TODO maybe make player watchers instead
 				
 				// Clear Input Data
+				stream.Flush();
 				inputNames.Clear();
 				inputData.Clear();
 			}
@@ -53,17 +59,17 @@ public class GameManager : MonoBehaviour {
 			// Pause Game On Escape
 			if(Input.GetKeyDown(KeyCode.Escape)){
 				paused = !paused;
-				user.GetComponentInChildren<CharacterMotor>().SetControllable(!paused);
-				user.GetComponentInChildren<WeaponHolder>().enabled = !paused;
-				if(user.GetComponentInChildren<Hunter>())user.GetComponentInChildren<Hunter>().active = !paused;
+				if(user.GetComponentInChildren<CharacterMotor>())
+					user.GetComponentInChildren<CharacterMotor>().SetControllable(!paused);
+				if(user.GetComponentInChildren<WeaponHolder>())
+					user.GetComponentInChildren<WeaponHolder>().enabled = !paused;
+				if(user.GetComponentInChildren<Hunter>())
+					user.GetComponentInChildren<Hunter>().active = !paused;
 			}
 		}
 	}
-	private string FloatToString(float a){
-		return a.ToString();
-	}
 	
-	public void StartGame () {
+	public void StartGame () { // Server Side
 		if(!Network.isServer)return;
 		
 		GameObject[] hunterSpawns = GameObject.FindGameObjectsWithTag("HunterSpawn");
@@ -82,7 +88,7 @@ public class GameManager : MonoBehaviour {
 		GetComponent<Interface>().Init();
 		started = true;
 	}
-	GameObject AddPlayerController (GameObject[] hunterSpawns, GameObject[] soldierSpawns, NetworkPlayer p){
+	GameObject AddPlayerController (GameObject[] hunterSpawns, GameObject[] soldierSpawns, NetworkPlayer p){ // Server Side
 		GameObject unit = Instantiate(Resources.Load("Prefabs/Hunter")) as GameObject;
 		unit.transform.position = hunterSpawns[Random.Range(0,hunterSpawns.Length-1)].transform.position;
 		unit.AddComponent<Controller>();
@@ -95,7 +101,7 @@ public class GameManager : MonoBehaviour {
 		players.Add(p, unit);
 		
 		foreach(NetworkPlayer player in Network.connections){
-			networkView.RPC("SendUserView", player, p.Equals(player));
+			networkView.RPC("SendUserView", player, unit.networkView.viewID, p.Equals(player));
 		}
 		
 		return unit;
@@ -109,32 +115,32 @@ public class GameManager : MonoBehaviour {
 			}
 		}
 	}
-	void OnLevelWasLoaded(int lvl) {
+	void OnLevelWasLoaded(int lvl) { // Client Side
 		if(Network.isClient)networkView.RPC("UserLevelLoaded",RPCMode.Server,Network.player);
 	}
 	
-	private void UpdateInput(ref PlayerInput input){
+	private void UpdateInput(ref PlayerInput input){ // Local Server Side
 		input.look.x = Input.GetAxis("Mouse X");
 		input.look.y = Input.GetAxis("Mouse Y");
 		input.move.x = Input.GetAxis("Horizontal");
 		input.move.y = Input.GetAxis("Vertical");
 	}
-	private void ResetInput(ref PlayerInput input){
+	private void ResetInput(ref PlayerInput input){ // Local Server Side
 		input.move = Vector2.zero;
 		input.look = Vector2.zero;
 	}
-	private void CheckInput(){
+	private void CheckInput(){ // Client Side
 		AddInput("lookX",Input.GetAxis("Mouse X"));
 		AddInput("lookY",Input.GetAxis("Mouse Y"));
 		AddInput("moveX",Input.GetAxis("Horizontal"));
 		AddInput("moveY",Input.GetAxis("Vertical"));
 	}
-	private void AddInput(string name, float data){
+	private void AddInput(string name, float data){ // Client Side
 		inputNames.Add(name);
 		inputData.Add(data);
 	}
 	
-	void OnPlayerConnected(NetworkPlayer player){
+	void OnPlayerConnected(NetworkPlayer player){ // Server Side
 		if(Network.isServer){
 			foreach(DictionaryEntry pl in players){
 				(pl.Value as GameObject).networkView.SetScope(player,false);
@@ -144,18 +150,18 @@ public class GameManager : MonoBehaviour {
 	}
 	
 	[RPC]
-	public void LoadNetLevel(string level) {
+	public void LoadNetLevel(string level) { // Client Side
 		Application.LoadLevel(level);
 	}
 	[RPC]
-	public void UserLevelLoaded(NetworkPlayer player) {
+	public void UserLevelLoaded(NetworkPlayer player) { // Server Side
 		foreach(DictionaryEntry pl in players){
 			(pl.Value as GameObject).networkView.SetScope(player,true);
 		}
 		//networkView.RPC("SendUserView", player, (pl.Value as GameObject).networkView.viewID);
 	}
 	[RPC]
-	public void SendUserView(NetworkViewID data, bool local) {
+	public void SendUserView(NetworkViewID data, bool local) { // Client Side
 		GameObject cube = Instantiate(Resources.Load("Prefabs/Cube")) as GameObject;
 		cube.AddComponent<NetworkView>();
 		cube.networkView.stateSynchronization = NetworkStateSynchronization.Unreliable;
@@ -165,27 +171,34 @@ public class GameManager : MonoBehaviour {
 		if(local)user = cube;
 	}
 	[RPC]
-	public void SendGameStart() {
+	public void SendGameStart() { // Client Side
 		GetComponent<Interface>().user = user.transform;
 		GetComponent<Interface>().Init();
+		started = true;
 	}
 	[RPC]
-	public void GetUserInput(NetworkPlayer player, params string[] data) {
+	public void GetUserInput(NetworkPlayer player, byte[] data) { // Server Side
+		stream.Write(data, 0, data.Length);
+		stream.Position=0;
+		string[] names = (string[]) format.Deserialize(stream);
+		float[] input = (float[]) format.Deserialize(stream);
+		stream.Flush();
+		
 		if(players.Contains(player)){
 			Controller controller = (players[player] as GameObject).GetComponent<Controller>();
-			for(int i = 0; i < data.Length/2; i++){
-				switch(data[i]){
+			for(int i = 0; i < input.Length; i++){
+				switch(names[i]){
 				case "lookX":
-					controller.input.look.x = float.Parse(data[i+data.Length/2]);
+					controller.input.look.x = input[i];
 					break;
 				case "lookY":
-					controller.input.look.y = float.Parse(data[i+data.Length/2]);
+					controller.input.look.y = input[i];
 					break;
 				case "moveX":
-					controller.input.move.x = float.Parse(data[i+data.Length/2]);
+					controller.input.move.x = input[i];
 					break;
 				case "moveY":
-					controller.input.move.y = float.Parse(data[i+data.Length/2]);
+					controller.input.move.y = input[i];
 					break;
 				}
 			}

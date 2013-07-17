@@ -15,11 +15,25 @@ public class Controller : MonoBehaviour {
 	}
 	
 	void Update () {
+		// Rotation
 		transform.Rotate(0, input.look.x * sensitivityX, 0);
 		
 		rotationY += input.look.y * sensitivityY;
 		rotationY = Mathf.Clamp(rotationY, -90, 90);
 		cam.localEulerAngles = new Vector3(-rotationY, cam.localEulerAngles.y, 0);
+		
+		// Translation
+		Vector3 direction = new Vector3(input.move.x, 0, input.move.y);
+		CharacterMotor motor = GetComponent<CharacterMotor>();
+		if(motor){
+			if(direction != Vector3.zero){
+				float length = direction.magnitude;
+				length = Mathf.Min(1,length);
+				direction = direction.normalized * length * length;
+			}
+			motor.inputMoveDirection = transform.rotation * direction;
+			//motor.inputJump = Input.GetButton("Jump");
+		}
 	}
 }
 

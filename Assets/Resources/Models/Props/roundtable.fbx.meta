@@ -10,7 +10,7 @@ ModelImporter:
     4300000: roundtable_low
     9500000: //RootNode
   materials:
-    importMaterials: 1
+    importMaterials: 0
     materialName: 0
     materialSearch: 0
   animations:
@@ -41,9 +41,9 @@ ModelImporter:
   tangentSpace:
     normalSmoothAngle: 60
     splitTangentsAcrossUV: 1
-    normalImportMode: 1
-    tangentImportMode: 2
-  importAnimation: 1
+    normalImportMode: 0
+    tangentImportMode: 1
+  importAnimation: 0
   copyAvatar: 0
   humanDescription:
     human: []
@@ -59,5 +59,5 @@ ModelImporter:
     rootMotionBoneName: 
   lastHumanDescriptionAvatarSource: {instanceID: 0}
   additionalBone: 1
-  animationType: 2
+  animationType: 0
   userData: 

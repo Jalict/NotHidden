@@ -7,7 +7,7 @@ public class Knife : Weapon {
 
 	void Start () {
 		damage = 40;
-		LoadModel("Models/Weapons/Hunter/knife",new Vector3(0.5f,-0.25f,0.75f),Vector3.forward,1);
+		LoadModel("Prefabs/Models/knife",new Vector3(0.5f,-0.25f,0.5f),Vector3.forward,1);
 	}
 	
 	public override void OnFire() {
