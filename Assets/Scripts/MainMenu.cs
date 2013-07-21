@@ -57,6 +57,7 @@ public class MainMenu : MonoBehaviour {
 		Destroy(gameObject);
 	}
 	void OnServerInitialized() {
+		Network.logLevel = NetworkLogLevel.Informational;
 		man = Instantiate(Resources.Load("Prefabs/Interface")) as GameObject;
 		DontDestroyOnLoad(man);
 		Application.LoadLevel("test01");

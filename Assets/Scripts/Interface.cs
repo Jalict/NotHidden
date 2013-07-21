@@ -30,7 +30,7 @@ public class Interface : MonoBehaviour {
 		camsize = new Vector2(cam.pixelWidth*ratio,cam.pixelHeight*ratio);
 		screensize = camsize/ratio;
 		
-		MakeCube(new Vector3(0,0,10),new Vector3(0.1f,0.1f,0.1f),Color.black).renderer.material = Resources.Load("Materials/blankui") as Material;
+		MakeCube(new Vector3(0,0,10),new Vector3(0.1f,0.1f,0.1f),Color.black);
 		
 		jumpbar = new Bar(new Vector2(50,Screen.height-100),new Vector2(300,30),4,(Color.cyan+Color.blue)/2, Color.black,transform);
 		healthbar = new Bar(new Vector2(50,Screen.height-50),new Vector2(300,30),4,(Color.red+Color.grey)/2, Color.black,transform);
@@ -70,13 +70,13 @@ public class Interface : MonoBehaviour {
 		
 		private Vector2 pos;
 		private Vector2 size;
-		private float border;
+		//private float border;
 		private bool invert;
 		
 		internal Bar(Vector2 pos, Vector2 size, float border, Color color, Color borderColor, Transform parent, bool invert = false){
 			pos *= 2; size *= 2; border *= 2;
 			this.pos = pos;
-			this.border = border;
+			//this.border = border;
 			this.size = size;
 			this.invert = invert;
 			

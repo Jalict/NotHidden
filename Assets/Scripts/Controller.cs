@@ -2,46 +2,81 @@ using UnityEngine;
 using System.Collections;
 
 public class Controller : MonoBehaviour {
-	public PlayerInput input = new PlayerInput(Vector2.zero,Vector2.zero);
-	
-	public float sensitivityX = 8;
-	public float sensitivityY = 8;
+	public bool paused = false;
+	public float sensitivityX = 1;
+	public float sensitivityY = 1;
 	
 	private Transform cam;
+	private CharacterMotor motor;
+	private WeaponHolder weapon;
+	private Hunter hunter;
 	private float rotationY = 0;
 
 	void Start () {
 		cam = GetComponentInChildren<Camera>().transform;
+		motor = GetComponent<CharacterMotor>();
+		weapon = GetComponent<WeaponHolder>();
+		hunter = GetComponent<Hunter>();
 	}
 	
 	void Update () {
-		// Rotation
-		transform.Rotate(0, input.look.x * sensitivityX, 0);
-		
-		rotationY += input.look.y * sensitivityY;
-		rotationY = Mathf.Clamp(rotationY, -90, 90);
-		cam.localEulerAngles = new Vector3(-rotationY, cam.localEulerAngles.y, 0);
-		
-		// Translation
-		Vector3 direction = new Vector3(input.move.x, 0, input.move.y);
-		CharacterMotor motor = GetComponent<CharacterMotor>();
-		if(motor){
-			if(direction != Vector3.zero){
-				float length = direction.magnitude;
-				length = Mathf.Min(1,length);
-				direction = direction.normalized * length * length;
+		if(!paused){
+			// Rotation
+			transform.Rotate(0, Input.GetAxis("Mouse X") * sensitivityX, 0);
+			
+			rotationY += Input.GetAxis("Mouse Y") * sensitivityY;
+			rotationY = Mathf.Clamp(rotationY, -90, 90);
+			cam.localEulerAngles = new Vector3(-rotationY, cam.localEulerAngles.y, 0);
+			
+			// Translation
+			Vector3 direction = new Vector3(Input.GetAxis("LeftRight"), 0, Input.GetAxis("BackwardForward"));
+			if(motor){
+				if(direction != Vector3.zero){
+					float length = direction.magnitude;
+					length = Mathf.Min(1,length);
+					direction = direction.normalized * length * length;
+				}
+				motor.inputMoveDirection = transform.rotation * direction;
+				motor.inputJump = Input.GetButtonDown("Jump");
 			}
-			motor.inputMoveDirection = transform.rotation * direction;
-			//motor.inputJump = Input.GetButton("Jump");
+			
+			// Weapon
+			if(weapon){
+				weapon.inputFire = Input.GetButtonDown("Fire");
+				weapon.inputFiring = Input.GetButton("Fire");
+				weapon.inputAltFire = Input.GetButtonDown("Alternate Fire");
+				weapon.inputAltFiring = Input.GetButton("Alternate Fire");
+				weapon.inputScroll = Input.GetAxis("Scroll Weapons");
+			}
+			
+			// Hunter Actions
+			if(hunter){
+				hunter.inputJump = Input.GetButtonDown("Hunter Leap");
+				hunter.inputCling = Input.GetButton("Hunter Leap");
+				hunter.inputUncling = Input.GetButton("Jump");
+				hunter.inputVision = Input.GetButton("Hunter Vision");
+			}
+		} else {
+			// Translation
+			if(motor){
+				motor.inputMoveDirection = Vector3.zero;
+				motor.inputJump = false;
+			}
+			// Weapon
+			if(weapon){
+				weapon.inputFire = false;
+				weapon.inputFiring = false;
+				weapon.inputAltFire = false;
+				weapon.inputAltFiring = false;
+				weapon.inputScroll = 0;
+			}
+			// Hunter Actions
+			if(hunter){
+				hunter.inputJump = false;
+				hunter.inputCling = false;
+				hunter.inputUncling = false;
+				hunter.inputVision = false;
+			}
 		}
-	}
-}
-
-public struct PlayerInput{
-	public Vector2 move;
-	public Vector2 look;
-	public PlayerInput(Vector2 move, Vector2 look){
-		this.move = move;
-		this.look = look;
 	}
 }

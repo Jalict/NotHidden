@@ -7,11 +7,17 @@ using System;
 
 public class Hunter : MonoBehaviour {
 	
+	// Input variables
+	public bool inputJump = false;
+	public bool inputCling = false;
+	public bool inputUncling = false;
+	public bool inputVision = false;
+	
 	// Key Settings
-	public string jumpKey = "Fire2";
-	public string clingKey = "Fire2";
-	public string unclingKey = "Jump";
-	public string visionKey = "Fire3";
+	//public string jumpKey = "Fire2";
+	//public string clingKey = "Fire2";
+	//public string unclingKey = "Jump";
+	//public string visionKey = "Fire3";
 	// Energy Settings
 	public float maxEnergy = 100;
 	public float energyRegen = 20;
@@ -62,7 +68,7 @@ public class Hunter : MonoBehaviour {
 		
 		// Cling to walls
 		if(hanging){
-			if(Input.GetButton(unclingKey) || energy<clingCost*Time.deltaTime){
+			if(inputUncling || energy<clingCost*Time.deltaTime){
 				hanging = false;
 				motor.SetControllable(true);
 				motor.movement.gravity = gravity;
@@ -77,7 +83,7 @@ public class Hunter : MonoBehaviour {
 		
 		if(active){
 			// Jump
-			if(Input.GetButtonDown(jumpKey) && (motor.grounded || hanging)){
+			if(inputJump && (motor.grounded || hanging)){
 				hanging = false;
 				motor.SetControllable(true);
 				motor.movement.gravity = gravity;
@@ -88,7 +94,7 @@ public class Hunter : MonoBehaviour {
 			
 			// Switch camera mode
 			int i = visions.Count;
-			if(Input.GetButton(visionKey) && energy>=visionCost*Time.deltaTime && motor.movement.velocity.magnitude==0){
+			if(inputVision && energy>=visionCost*Time.deltaTime && motor.movement.velocity.magnitude==0){
 				energy -= visionCost*Time.deltaTime;
 				if(!visionCam.enabled){
 					visionCam.enabled = true;
@@ -122,7 +128,7 @@ public class Hunter : MonoBehaviour {
 		if (jumping) {
 			Vector3 dir = hit.moveDirection;
 			dir.y = Mathf.Max(0,dir.y);
-			if (dir.magnitude > 0.1 && Input.GetButton(clingKey)) {
+			if (dir.magnitude > 0.1 && inputCling) {
 				hanging = true;
 			}
 		}
