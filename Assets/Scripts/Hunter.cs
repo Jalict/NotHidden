@@ -13,11 +13,6 @@ public class Hunter : MonoBehaviour {
 	public bool inputUncling = false;
 	public bool inputVision = false;
 	
-	// Key Settings
-	//public string jumpKey = "Fire2";
-	//public string clingKey = "Fire2";
-	//public string unclingKey = "Jump";
-	//public string visionKey = "Fire3";
 	// Energy Settings
 	public float maxEnergy = 100;
 	public float energyRegen = 20;
@@ -26,7 +21,7 @@ public class Hunter : MonoBehaviour {
 	public float visionCost = 30;
 	// Other Settings
 	public float jumpForce = 40;
-	public List<Transform> visions;
+	public List<Transform> visions = new List<Transform>();
 	new public bool active = true;
 	
 	// Jumping variables

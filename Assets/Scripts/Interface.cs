@@ -48,6 +48,9 @@ public class Interface : MonoBehaviour {
 		cube.renderer.material.color = color;
 		return cube;
 	}
+	void OnGUI () {
+		GUI.Box(new Rect(10,10,100,22),"Players: "+(Network.connections.Length+1).ToString());
+	}
 	
 	void Update () {
 		if(user){

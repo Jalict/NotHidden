@@ -18,7 +18,7 @@ public class WeaponHolder : MonoBehaviour {
 								KeyCode.Alpha6,KeyCode.Alpha7,KeyCode.Alpha8,KeyCode.Alpha9,KeyCode.Alpha0};
 	
 	
-	public void Load(params string[] weaponNames) {
+	public void Give(params string[] weaponNames) {
 		// Check if inited
 		if(!ready){
 			weapons = new List<Weapon>();
