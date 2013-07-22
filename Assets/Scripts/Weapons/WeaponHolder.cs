@@ -76,10 +76,16 @@ public class WeaponHolder : MonoBehaviour {
 		
 		// Fire gadget
 		if(inputFire){
-			BroadcastMessage("OnFire");
+			SendMessage("OnFire");
 		}
 		if(inputFiring){
-			BroadcastMessage("OnFiring");
+			SendMessage("OnFiring");
+		}
+		if(inputAltFire){
+			SendMessage("OnAltFire");
+		}
+		if(inputAltFiring){
+			SendMessage("OnAltFiring");
 		}
 	}
 	public float maxAmmo{

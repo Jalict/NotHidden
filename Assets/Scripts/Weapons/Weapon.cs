@@ -36,6 +36,10 @@ public class Weapon : MonoBehaviour {
 	}
 	public virtual void OnFiring(){
 	}
+	public virtual void OnAltFire(){
+	}
+	public virtual void OnAltFiring(){
+	}
 	
 	public bool empty {
 		get { return ammo==0; }

@@ -12,7 +12,7 @@ public class Health : MonoBehaviour {
 	public void Damage(float dmg){
 		HP -= dmg;
 		if(HP <= 0){
-			Destroy(gameObject);
+			Network.Destroy(gameObject);
 		}
 	}
 }

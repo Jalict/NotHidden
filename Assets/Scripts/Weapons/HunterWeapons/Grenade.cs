@@ -14,8 +14,9 @@ public class Grenade : Weapon {
 	public override void OnFire(){
 		if(!enabled)return;
 		if(ammo>0){
-			GameObject grenade = Instantiate(Resources.Load("Prefabs/Grenade")) as GameObject;
-			grenade.transform.position = cam.transform.position+cam.transform.forward*1;
+			GameObject grenade = Network.Instantiate(Resources.Load("Prefabs/Grenade"),
+				cam.transform.position+cam.transform.forward*1,
+				Quaternion.identity, 0) as GameObject;
 			grenade.rigidbody.AddForce(cam.transform.forward*throwForce);
 			grenade.rigidbody.AddTorque(Vector3.right*500);
 			ammo -= 1;

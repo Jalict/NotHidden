@@ -31,29 +31,27 @@ public class MainMenu : MonoBehaviour {
 		
 		password = GUI.TextField(new Rect(300,20,168,20),password,16);*/
 		
-		GUILayout.Space(10);
+		GUILayout.BeginArea(new Rect(100, 50, Screen.width-200,Screen.height-100));
 		GUILayout.BeginHorizontal();
-		GUILayout.Space(10);
-		GUILayout.BeginHorizontal();
-		if(GUILayout.Button("Start Server")){
+		if(GUILayout.Button("Start Server", GUILayout.Width(100))){
 			if(port > 0){
 				Network.incomingPassword = password;
 				Network.InitializeServer(maxp-1,port,!Network.HavePublicAddress()); // nat = !Network.HavePublicAddress()
-				MasterServer.RegisterHost("NotHidden","NotHiddenGame","Comment");
+				MasterServer.RegisterHost("NotHidden",servername,"Description");
 			}
 		}
 		GUILayout.Space(5);
-		maxps = GUILayout.TextField(maxps,2);
+		maxps = GUILayout.TextField(maxps,2, GUILayout.Width(22));
 		int.TryParse(maxps,out maxp);
 		maxps = maxp>0?maxp.ToString():"";
 		GUILayout.Space(5);
-		ports = GUILayout.TextField(ports,5);
+		/*ports = GUILayout.TextField(ports,5, GUILayout.Width(100));
 		int.TryParse(ports,out port);
 		ports = port>0?port.ToString():"";
-		GUILayout.Space(5);
-		servername = GUILayout.TextField(servername,32);
-		GUILayout.Space(5);
-		password = GUILayout.TextField(password,16);
+		GUILayout.Space(5);*/
+		servername = GUILayout.TextField(servername,32, GUILayout.Width(320));
+		//GUILayout.Space(5);
+		//password = GUILayout.TextField(password,16, GUILayout.Width(160));
 		GUILayout.EndHorizontal();
 		GUILayout.Space(10);
 		
@@ -95,7 +93,14 @@ public class MainMenu : MonoBehaviour {
 			}
 			GUILayout.EndHorizontal();
 		}
-		GUILayout.EndHorizontal();
+		GUILayout.Space(10);
+		
+		// Loadout Button
+		if(GUILayout.Button("Change Loadout", GUILayout.Width(120))){
+			
+		}
+		
+		GUILayout.EndArea();
 	}
 	void OnConnectedToServer() {
 		man = Instantiate(Resources.Load("Prefabs/Interface")) as GameObject;

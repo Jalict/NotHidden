@@ -14,7 +14,7 @@ public class Knife : Weapon {
 		if(!enabled)return;
 		RaycastHit hit;
 		if(Physics.Raycast(cam.transform.position,cam.transform.forward,out hit,hitDistance,1<<LayerMask.NameToLayer("Enemies"))){
-			if(hit.transform.GetComponentInChildren<Knife>() == this)
+			if(hit.transform.GetComponentInChildren<Knife>() == transform)
 				return;
 			if(hit.transform.GetComponent<Health>() != null){
 				hit.transform.GetComponent<Health>().Damage(damage);
@@ -23,5 +23,6 @@ public class Knife : Weapon {
 				hit.transform.GetComponent<CharacterMotor>().SetVelocity(cam.transform.forward*hitForce);
 			}
 		}
+		GetComponent<NetworkView>().RPC("KnifeRaycast",RPCMode.Others,cam.transform.position,cam.transform.forward,hitDistance,damage);
 	}
 }

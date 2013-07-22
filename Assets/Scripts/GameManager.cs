@@ -19,7 +19,7 @@ public class GameManager : MonoBehaviour {
 			if(Input.GetKeyDown(KeyCode.Escape)) paused = !paused;
 			
 			Screen.lockCursor = !paused;
-			user.GetComponentInChildren<Controller>().paused = paused;
+			if(user)user.GetComponentInChildren<Controller>().paused = paused;
 		}
 	}
 	
@@ -68,6 +68,7 @@ public class GameManager : MonoBehaviour {
 			weapon.Give("BaseGun");
 		}
 		
+		unit.AddComponent<Dummy>();
 		unit.AddComponent<NetworkView>();
 		unit.networkView.viewID = Network.AllocateViewID();
 		unit.networkView.stateSynchronization = NetworkStateSynchronization.Unreliable;
@@ -121,6 +122,7 @@ public class GameManager : MonoBehaviour {
 	[RPC]
 	public void SendUserView(NetworkViewID view) { // Client Side
 		GameObject unit = Instantiate(Resources.Load("Prefabs/Cube")) as GameObject;
+		unit.AddComponent<Dummy>();
 		unit.AddComponent<NetworkView>();
 		unit.networkView.stateSynchronization = NetworkStateSynchronization.Unreliable;
 		unit.networkView.observed = unit.transform;

@@ -4,11 +4,8 @@ using System.Collections;
 public class Bullet : MonoBehaviour {
 	internal Vector3 move = Vector3.zero;
 	internal float damage = 0;
-	internal float range = 100; 
-	
-	void Start () {
-	
-	}
+	internal float range = 1000;
+	internal bool dummy = true;
 	
 	void Update () {
 		RaycastHit hit;
