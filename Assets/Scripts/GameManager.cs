@@ -5,22 +5,50 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
 
 public class GameManager : MonoBehaviour {
+	internal bool ending = false;
+	internal string username;
+	
 	private GameObject user;
-	private Hashtable players;
+	private Hashtable playernames;
+	private Hashtable playeralive;
+	
+	private bool typing = false;
 	private bool paused = false;
 	private bool started = false;
 	
+	private List<string> chat = new List<string>();
+	private string chatInput = "";
+	private bool chatEnable = false;
+	private float chatDelay = 0;
+	private float dChatDelay = 4;
+	
 	void Start () {
-		players = new Hashtable(Network.maxConnections);
+		playernames = new Hashtable(Network.maxConnections);
+		playeralive = new Hashtable(Network.maxConnections);
+		name = "Manager";
 	}
 	
 	void Update () {
-		if(started){
-			if(Input.GetKeyDown(KeyCode.Escape)) paused = !paused;
-			
-			Screen.lockCursor = !paused;
-			if(user)user.GetComponentInChildren<Controller>().paused = paused;
+		chatDelay -= Time.deltaTime;
+		if(Input.GetKeyDown(KeyCode.Return)) { 
+			typing = !typing; 
+			paused = typing; 
+			if(typing) chatInput = "";
+			else SendChat ();
 		}
+		if(!typing){
+			if(started){
+				if(Input.GetKeyDown(KeyCode.Escape)) paused = !paused;
+			} else {
+				paused = true;
+			}	
+		} else {
+			paused = true;
+			if(Input.GetKeyDown(KeyCode.Escape)) { typing = false; paused = false; }
+		}
+		Screen.lockCursor = !paused;
+		if(user)user.GetComponentInChildren<Controller>().paused = paused;
+		if(user)GetComponentInChildren<Interface>().paused = paused && !typing;
 	}
 	
 	public void StartGame () { // Server Side
@@ -30,7 +58,12 @@ public class GameManager : MonoBehaviour {
 		bool[] sSpawns = new bool[GameObject.FindGameObjectsWithTag("SoldierSpawn").Length];
 		int hunter = Random.Range(0,Network.connections.Length);
 		int spawn = -1;
-		for(int i = 0; i < Network.connections.Length; i++){
+		
+		NetworkPlayer[] players = new NetworkPlayer[playernames.Count];
+		playernames.Keys.CopyTo(players,0);
+		for(int i = 0; i < players.Length; i++){
+			if(players[i]==Network.player)continue;
+			
 			while(spawn<0){
 				spawn = Random.Range(0,(i==hunter?hSpawns.Length:sSpawns.Length)-1);
 				if(i==hunter?hSpawns[spawn]:sSpawns[spawn]){
@@ -43,7 +76,7 @@ public class GameManager : MonoBehaviour {
 					else sSpawns[spawn] = true;
 				}
 			}
-			networkView.RPC("SendGameStart", Network.connections[i], i==hunter, spawn);
+			networkView.RPC("SendGameStart", players[i], i==hunter, spawn);
 		}
 		SendGameStart(Network.connections.Length==hunter,0);
 	}
@@ -63,40 +96,103 @@ public class GameManager : MonoBehaviour {
 		
 		WeaponHolder weapon = unit.AddComponent<WeaponHolder>();
 		if(hunter){
-			weapon.Give("Knife","Grenade");
+			weapon.Give("Knife","Grenade"); // TODO get loadout
 		} else {
 			weapon.Give("BaseGun");
 		}
 		
-		unit.AddComponent<Dummy>();
 		unit.AddComponent<NetworkView>();
 		unit.networkView.viewID = Network.AllocateViewID();
 		unit.networkView.stateSynchronization = NetworkStateSynchronization.Unreliable;
 		unit.networkView.observed = unit.transform;
+		unit.AddComponent<Dummy>();
 		
-		foreach(NetworkPlayer player in Network.connections){
-			networkView.RPC("SendUserView", player, unit.networkView.viewID);
-		}
+		networkView.RPC("SendUserView", RPCMode.OthersBuffered, unit.networkView.viewID);
 		
 		return unit;
 	}
 	
+	void OnUserSpawn(NetworkPlayer player) { // Any Side
+		if(!playeralive.ContainsKey(player))Debug.LogError("Player Not Found!");
+		playeralive[player] = true;
+	}
+	void OnUserDeath(NetworkPlayer player) { // Any Side
+		if(!playeralive.ContainsKey(player))Debug.LogError("Player Not Found!");
+		playeralive[player] = false;
+	}
+
+	void SendChat() {
+		if(chatInput.Length > 0) {
+			networkView.RPC("OnChat",RPCMode.All, chatInput, Network.player);
+			chatDelay = dChatDelay;
+		}
+		chatInput = "";
+		typing = false;
+		paused = false;
+		chatEnable = false;
+	}
+	
 	void OnGUI() {
-		if(Network.isServer && !started){
-			if(GUI.Button(new Rect(10,36,100,22),"Start Game")){
-				StartGame();
+		GUILayout.BeginArea(new Rect(20,20,Screen.width/2,Screen.height/2));
+		GUILayout.Box("Players: "+(playernames.Keys.Count).ToString(),GUILayout.Width(100));
+		GUILayout.Space(5);
+		if(!started){
+			if(Network.isServer){
+				if(GUILayout.Button("Start Game",GUILayout.Width(100))){
+					StartGame();
+				}
+				GUILayout.Space(5);
 			}
 		}
+		if(paused){
+			//GUI.skin.box.alignment = TextAnchor.MiddleLeft;
+			foreach(NetworkPlayer player in playernames.Keys){
+				GUILayout.Box(playernames[player] + ((bool)playeralive[player]==true?" - Alive":""),GUILayout.Width(Screen.width/8));
+				GUILayout.Space(5);
+			}
+			//GUI.skin.box.alignment = TextAnchor.MiddleCenter;
+		}
+		GUILayout.EndArea();
+		GUILayout.BeginArea(new Rect(20,Screen.height/2,Screen.width/4,Screen.height/3));
+		GUILayout.FlexibleSpace();
+		if(chatDelay > 0 || typing || paused){
+			GUI.skin.box.alignment = TextAnchor.LowerLeft;
+			while(chat.Count>18)chat.RemoveAt(0);
+			string showChat = chat.Count>0?chat[0]:"";
+			for(int i = 1; i<Mathf.Max(18,chat.Count); i++){
+				showChat = showChat + "\n" + (i<chat.Count?chat[i]:"");
+			}
+			GUILayout.Box(showChat);
+			GUI.skin.box.alignment = TextAnchor.MiddleCenter;
+		}
+		
+		if(typing){
+			GUI.SetNextControlName("ChatInput");
+			chatInput = GUILayout.TextField(chatInput);
+			GUI.FocusControl("ChatInput");
+			if (Event.current.isKey && Event.current.keyCode == KeyCode.Return) {
+				chatEnable = !chatEnable;
+				if(!chatEnable)SendChat();
+			}
+		}
+		GUILayout.EndArea();
+		GUILayout.BeginArea(new Rect(20,Screen.height/2+Screen.height/3,Screen.width/2,Screen.height/6));
+		if((paused && !typing) || (!started)){
+			GUILayout.Space(5);
+			if(GUILayout.Button("Exit To Menu",GUILayout.Width(150)))Network.Disconnect();
+			GUILayout.Space(5);
+			if(GUILayout.Button("Exit To Desktop",GUILayout.Width(150)))Application.Quit();
+		}
+		GUILayout.EndArea();
 	}
 	void OnLevelWasLoaded(int lvl) { // Client Side
-		if(Network.isClient)networkView.RPC("UserLevelLoaded",RPCMode.Server,Network.player);
+		networkView.RPC("OnPlayerJoin",RPCMode.OthersBuffered,username,Network.player);
+		OnPlayerJoin(username, Network.player);
 	}
+	
 	
 	void OnPlayerConnected(NetworkPlayer player){ // Server Side
 		if(Network.isServer){
-			foreach(DictionaryEntry pl in players){
-				(pl.Value as GameObject).networkView.SetScope(player,false);
-			}
 			networkView.RPC("LoadNetLevel",player,"test01");
 		}
 	}
@@ -105,7 +201,19 @@ public class GameManager : MonoBehaviour {
 		Network.DestroyPlayerObjects(player);
 	}
 	void OnDisconnectedFromServer(NetworkDisconnection info) { // Client Side
-		//started = false;
+		ending = true;
+		Application.LoadLevel("MainMenu");
+		Destroy(gameObject);
+	}
+	[RPC]
+	public void OnChat(string input, NetworkPlayer player) {
+		chat.Add(playernames[player]+": "+input);
+		chatDelay = dChatDelay;
+	}
+	[RPC]
+	public void OnPlayerJoin(string name, NetworkPlayer player) { // Client Side
+		playernames.Add(player,name);
+		playeralive.Add(player,false);
 	}
 	
 	[RPC]
@@ -113,20 +221,13 @@ public class GameManager : MonoBehaviour {
 		Application.LoadLevel(level);
 	}
 	[RPC]
-	public void UserLevelLoaded(NetworkPlayer player) { // Server Side
-		/*foreach(DictionaryEntry pl in players){
-			(pl.Value as GameObject).networkView.SetScope(player,true);
-		}*/
-		//networkView.RPC("SendUserView", player, (pl.Value as GameObject).networkView.viewID);
-	}
-	[RPC]
-	public void SendUserView(NetworkViewID view) { // Client Side
+	public void SendUserView(NetworkViewID view) { // Any Side
 		GameObject unit = Instantiate(Resources.Load("Prefabs/Cube")) as GameObject;
-		unit.AddComponent<Dummy>();
 		unit.AddComponent<NetworkView>();
 		unit.networkView.stateSynchronization = NetworkStateSynchronization.Unreliable;
 		unit.networkView.observed = unit.transform;
 		unit.networkView.viewID = view;
+		unit.AddComponent<Dummy>();
 	}
 	[RPC]
 	public void SendGameStart(bool hunter, int spawn) { // Client Side
@@ -134,5 +235,6 @@ public class GameManager : MonoBehaviour {
 		GetComponent<Interface>().user = user.transform;
 		GetComponent<Interface>().Init();
 		started = true;
+		paused = false;
 	}
 }

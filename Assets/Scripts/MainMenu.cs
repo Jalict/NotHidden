@@ -9,6 +9,7 @@ public class MainMenu : MonoBehaviour {
 	private string servername = "Server Name";
 	private string password = "";
 	private string ip = "0.0.0.0";
+	private string username = "Player";
 	
 	GameObject man;
 
@@ -31,7 +32,19 @@ public class MainMenu : MonoBehaviour {
 		
 		password = GUI.TextField(new Rect(300,20,168,20),password,16);*/
 		
-		GUILayout.BeginArea(new Rect(100, 50, Screen.width-200,Screen.height-100));
+		GUILayout.BeginArea(new Rect(20, 20, Screen.width/2,Screen.height-60));
+		GUILayout.BeginHorizontal();
+		GUILayout.Label("Username: ");
+		GUILayout.Space(5);
+		username = GUILayout.TextField(username,16,GUILayout.Width(150));
+		GUILayout.FlexibleSpace();
+		GUILayout.EndHorizontal();
+		GUILayout.Space(5);
+		// Loadout Button
+		if(GUILayout.Button("Change Loadout", GUILayout.Width(120))){
+			
+		}
+		GUILayout.Space(5);
 		GUILayout.BeginHorizontal();
 		if(GUILayout.Button("Start Server", GUILayout.Width(100))){
 			if(port > 0){
@@ -71,6 +84,8 @@ public class MainMenu : MonoBehaviour {
 		}*/
 		
 		// Server List
+		if(GUILayout.Button("Refresh", GUILayout.Width(100))) MasterServer.RequestHostList("NotHidden");
+		GUILayout.Space(5);
 		HostData[] data = MasterServer.PollHostList();
 		foreach (HostData host in data) {
 			GUILayout.BeginHorizontal();
@@ -93,23 +108,19 @@ public class MainMenu : MonoBehaviour {
 			}
 			GUILayout.EndHorizontal();
 		}
-		GUILayout.Space(10);
-		
-		// Loadout Button
-		if(GUILayout.Button("Change Loadout", GUILayout.Width(120))){
-			
-		}
+		GUILayout.FlexibleSpace();
 		
 		GUILayout.EndArea();
 	}
 	void OnConnectedToServer() {
 		man = Instantiate(Resources.Load("Prefabs/Interface")) as GameObject;
+		man.GetComponent<GameManager>().username = username;
 		DontDestroyOnLoad(man);
 		Destroy(gameObject);
 	}
 	void OnServerInitialized() {
-		Network.logLevel = NetworkLogLevel.Informational;
 		man = Instantiate(Resources.Load("Prefabs/Interface")) as GameObject;
+		man.GetComponent<GameManager>().username = username;
 		DontDestroyOnLoad(man);
 		Application.LoadLevel("test01");
 		Destroy(gameObject);

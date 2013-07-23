@@ -4,11 +4,15 @@ using System.Collections;
 public class Dummy : MonoBehaviour {
 
 	void Start () {
-	
+		if(GameObject.Find("Manager"))GameObject.Find("Manager").SendMessage("OnUserSpawn",networkView.owner);
 	}
 	
 	void Update () {
 	
+	}
+	
+	void OnDestroy () {
+		if(GameObject.Find("Manager"))GameObject.Find("Manager").SendMessage("OnUserDeath",networkView.owner);
 	}
 	
 	[RPC]
