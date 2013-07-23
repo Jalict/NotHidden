@@ -16,11 +16,16 @@ public class GameManager : MonoBehaviour {
 	private bool paused = false;
 	private bool started = false;
 	
+	// Chat Variables
 	private List<string> chat = new List<string>();
 	private string chatInput = "";
-	private bool chatEnable = false;
+	private bool chatEnable = false; 
 	private float chatDelay = 0;
 	private float dChatDelay = 4;
+	
+	private float matchTime = 0;
+	private float dMatchTime = 60;
+	private NetworkPlayer currentHunter;
 	
 	void Start () {
 		playernames = new Hashtable(Network.maxConnections);
@@ -29,7 +34,26 @@ public class GameManager : MonoBehaviour {
 	}
 	
 	void Update () {
+		matchTime -= Time.deltaTime;
 		chatDelay -= Time.deltaTime;
+		
+		if(Network.isServer && started){
+			int numAlive = 0;
+			foreach(bool a in playeralive.Values)
+				if(a)numAlive++;
+			if(matchTime<=0){
+				networkView.RPC("SendMatchEnd",RPCMode.All,"TimeOut");
+			}
+			if(dMatchTime-matchTime > 5){
+				if(!(bool)playeralive[currentHunter]){
+					networkView.RPC("SendMatchEnd",RPCMode.All,"SoldierWin");
+				}
+				if(numAlive == 0){
+					networkView.RPC("SendMatchEnd",RPCMode.All,"HunterWin");
+				}
+			}
+		}
+		
 		if(Input.GetKeyDown(KeyCode.Return)) { 
 			typing = !typing; 
 			paused = typing; 
@@ -54,15 +78,20 @@ public class GameManager : MonoBehaviour {
 	public void StartGame () { // Server Side
 		if(!Network.isServer)return;
 		
+		// TODO improve spawn selection
+		
 		bool[] hSpawns = new bool[GameObject.FindGameObjectsWithTag("HunterSpawn").Length];
 		bool[] sSpawns = new bool[GameObject.FindGameObjectsWithTag("SoldierSpawn").Length];
-		int hunter = Random.Range(0,Network.connections.Length);
 		int spawn = -1;
 		
 		NetworkPlayer[] players = new NetworkPlayer[playernames.Count];
 		playernames.Keys.CopyTo(players,0);
+		int hunter = Random.Range(0,players.Length);
 		for(int i = 0; i < players.Length; i++){
-			if(players[i]==Network.player)continue;
+			if(players[i]==Network.player){
+				if(i==hunter)currentHunter=players[i];
+				continue;
+			}
 			
 			while(spawn<0){
 				spawn = Random.Range(0,(i==hunter?hSpawns.Length:sSpawns.Length)-1);
@@ -76,6 +105,7 @@ public class GameManager : MonoBehaviour {
 					else sSpawns[spawn] = true;
 				}
 			}
+			if(i==hunter)currentHunter=players[i];
 			networkView.RPC("SendGameStart", players[i], i==hunter, spawn);
 		}
 		SendGameStart(Network.connections.Length==hunter,0);
@@ -133,6 +163,23 @@ public class GameManager : MonoBehaviour {
 	}
 	
 	void OnGUI() {
+		if(matchTime>0){
+			GUILayout.Space(40);
+			GUILayout.BeginHorizontal();
+			int min = 0;
+			int sec = (int)matchTime;
+			while(sec>=60){
+				min++;
+				sec-=60;
+			}
+			float wid1 = 0;
+			float wid2 = 0;
+			GUI.skin.box.CalcMinMaxWidth(new GUIContent(min+":"+sec),out wid1,out wid2);
+			GUILayout.Space(Screen.height/2-wid2);
+			GUILayout.Box(min+":"+sec);
+			GUILayout.FlexibleSpace();
+			GUILayout.EndHorizontal();
+		}
 		GUILayout.BeginArea(new Rect(20,20,Screen.width/2,Screen.height/2));
 		GUILayout.Box("Players: "+(playernames.Keys.Count).ToString(),GUILayout.Width(100));
 		GUILayout.Space(5);
@@ -236,5 +283,14 @@ public class GameManager : MonoBehaviour {
 		GetComponent<Interface>().Init();
 		started = true;
 		paused = false;
+		matchTime = dMatchTime;
+	}
+	[RPC]
+	public void SendMatchEnd(string message) {
+		matchTime = 0;
+		Destroy(user);
+		started = false;
+		
+		// TODO show winner
 	}
 }
