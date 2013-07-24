@@ -263,6 +263,11 @@ public class GameManager : MonoBehaviour {
 	}
 	[RPC]
 	public void OnPlayerJoin(string name, NetworkPlayer player) { // Client Side
+		if(playernames == null || playeralive == null){
+			playernames = new Hashtable(Network.maxConnections);
+			playeralive = new Hashtable(Network.maxConnections);
+			name = "Manager";
+		}
 		playernames.Add(player,name);
 		playeralive.Add(player,false);
 	}

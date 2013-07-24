@@ -24,10 +24,12 @@ public class Dummy : MonoBehaviour {
 	}
 	
 	void Update () {
-		anim.SetFloat("Speed",GetComponent<Controller>().moveInput.z);
-		anim.SetFloat("Direction",GetComponent<Controller>().moveInput.x);
-		model.transform.localPosition = Vector3.down*0.93f;
-		model.transform.localRotation = Quaternion.identity;
+		if(networkView.isMine){
+			anim.SetFloat("Speed",GetComponent<Controller>().moveInput.z);
+			anim.SetFloat("Direction",GetComponent<Controller>().moveInput.x);
+			model.transform.localPosition = Vector3.down*0.93f;
+			model.transform.localRotation = Quaternion.identity;
+		}
 	}
 	
 	void OnDestroy () {
