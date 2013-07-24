@@ -5,11 +5,12 @@ public class Dummy : MonoBehaviour {
 	GameObject model;
 	Animator anim;
 
-	void Start () {
+	public void Init (bool hunter = false) {
 		if(GameObject.Find("Manager"))GameObject.Find("Manager").SendMessage("OnUserSpawn",networkView.owner);
-		model = Instantiate(Resources.Load("Models/Alpha@t-pose_1")) as GameObject;
+		if(hunter) model = Instantiate(Resources.Load("Models/Alpha@t-pose_1")) as GameObject;
+		else model = Instantiate(Resources.Load("Models/swat")) as GameObject;
 		model.transform.parent = transform;
-		model.transform.localPosition = Vector3.down*0.9f;
+		model.transform.localPosition = Vector3.down*0.93f;
 		anim = model.GetComponent<Animator>();
 		anim.runtimeAnimatorController = Resources.Load("Animations/AlphaController") as RuntimeAnimatorController;
 		if(networkView.isMine)
@@ -25,7 +26,7 @@ public class Dummy : MonoBehaviour {
 	void Update () {
 		anim.SetFloat("Speed",GetComponent<Controller>().moveInput.z);
 		anim.SetFloat("Direction",GetComponent<Controller>().moveInput.x);
-		model.transform.localPosition = Vector3.down*0.9f;
+		model.transform.localPosition = Vector3.down*0.93f;
 		model.transform.localRotation = Quaternion.identity;
 	}
 	

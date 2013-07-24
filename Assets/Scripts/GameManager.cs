@@ -131,13 +131,17 @@ public class GameManager : MonoBehaviour {
 			weapon.Give("BaseGun");
 		}
 		
-		unit.AddComponent<NetworkView>();
-		unit.networkView.viewID = Network.AllocateViewID();
-		unit.networkView.stateSynchronization = NetworkStateSynchronization.Unreliable;
-		unit.networkView.observed = unit.transform;
-		unit.AddComponent<Dummy>();
+		NetworkView nview = unit.AddComponent<NetworkView>();
+		nview.viewID = Network.AllocateViewID();
+		nview.stateSynchronization = NetworkStateSynchronization.Unreliable;
+		nview.observed = unit.transform;
+		unit.AddComponent<Dummy>().Init();
+		NetworkView aview = unit.AddComponent<NetworkView>();
+		aview.viewID = Network.AllocateViewID();
+		aview.stateSynchronization = NetworkStateSynchronization.ReliableDeltaCompressed;
+		aview.observed = unit.GetComponentInChildren<Animator>();
 		
-		networkView.RPC("SendUserView", RPCMode.OthersBuffered, unit.networkView.viewID);
+		networkView.RPC("SendUserView", RPCMode.OthersBuffered, nview.viewID, aview.viewID);
 		
 		return unit;
 	}
@@ -268,13 +272,18 @@ public class GameManager : MonoBehaviour {
 		Application.LoadLevel(level);
 	}
 	[RPC]
-	public void SendUserView(NetworkViewID view) { // Any Side
+	public void SendUserView(NetworkViewID view, NetworkViewID animview) { // Any Side
 		GameObject unit = new GameObject("Player");
-		unit.AddComponent<NetworkView>();
-		unit.networkView.stateSynchronization = NetworkStateSynchronization.Unreliable;
-		unit.networkView.observed = unit.transform;
-		unit.networkView.viewID = view;
-		unit.AddComponent<Dummy>();
+		NetworkView nview = unit.AddComponent<NetworkView>();
+		nview.stateSynchronization = NetworkStateSynchronization.Unreliable;
+		nview.observed = unit.transform;
+		nview.viewID = view;
+		
+		unit.AddComponent<Dummy>().Init();
+		nview = unit.AddComponent<NetworkView>();
+		nview.stateSynchronization = NetworkStateSynchronization.ReliableDeltaCompressed;
+		nview.observed = unit.GetComponentInChildren<Animator>();
+		nview.viewID = view;
 	}
 	[RPC]
 	public void SendGameStart(bool hunter, int spawn) { // Client Side
