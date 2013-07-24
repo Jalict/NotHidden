@@ -269,7 +269,7 @@ public class GameManager : MonoBehaviour {
 	}
 	[RPC]
 	public void SendUserView(NetworkViewID view) { // Any Side
-		GameObject unit = Instantiate(Resources.Load("Prefabs/Cube")) as GameObject;
+		GameObject unit = new GameObject("Player");
 		unit.AddComponent<NetworkView>();
 		unit.networkView.stateSynchronization = NetworkStateSynchronization.Unreliable;
 		unit.networkView.observed = unit.transform;

@@ -5,6 +5,7 @@ public class Controller : MonoBehaviour {
 	public bool paused = false;
 	public float sensitivityX = 1;
 	public float sensitivityY = 1;
+	public Vector3 moveInput = Vector3.zero;
 	
 	private Transform cam;
 	private CharacterMotor motor;
@@ -29,14 +30,14 @@ public class Controller : MonoBehaviour {
 			cam.localEulerAngles = new Vector3(-rotationY, cam.localEulerAngles.y, 0);
 			
 			// Translation
-			Vector3 direction = new Vector3(Input.GetAxis("LeftRight"), 0, Input.GetAxis("BackwardForward"));
+			moveInput = new Vector3(Input.GetAxis("LeftRight"), 0, Input.GetAxis("BackwardForward"));
 			if(motor){
-				if(direction != Vector3.zero){
-					float length = direction.magnitude;
+				if(moveInput != Vector3.zero){
+					float length = moveInput.magnitude;
 					length = Mathf.Min(1,length);
-					direction = direction.normalized * length * length;
+					moveInput = moveInput.normalized * length * length;
 				}
-				motor.inputMoveDirection = transform.rotation * direction;
+				motor.inputMoveDirection = transform.rotation * moveInput;
 				motor.inputJump = Input.GetButtonDown("Jump");
 			}
 			
