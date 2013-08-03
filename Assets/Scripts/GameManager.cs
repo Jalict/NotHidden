@@ -131,17 +131,19 @@ public class GameManager : MonoBehaviour {
 			weapon.Give("BaseGun");
 		}
 		
-		NetworkView nview = unit.AddComponent<NetworkView>();
-		nview.viewID = Network.AllocateViewID();
-		nview.stateSynchronization = NetworkStateSynchronization.Unreliable;
-		nview.observed = unit.transform;
-		unit.AddComponent<Dummy>().Init();
-		NetworkView aview = unit.AddComponent<NetworkView>();
-		aview.viewID = Network.AllocateViewID();
-		aview.stateSynchronization = NetworkStateSynchronization.ReliableDeltaCompressed;
-		aview.observed = unit.GetComponentInChildren<Animator>();
+		unit.AddComponent<NetworkView>();
+		unit.networkView.viewID = Network.AllocateViewID();
+		unit.networkView.stateSynchronization = NetworkStateSynchronization.Unreliable;
+		unit.networkView.observed = unit.transform;
 		
-		networkView.RPC("SendUserView", RPCMode.OthersBuffered, nview.viewID, aview.viewID);
+		unit.AddComponent<Dummy>().Init();
+		Animator anim = unit.GetComponentInChildren<Animator>();
+		anim.gameObject.AddComponent<NetworkView>();
+		anim.networkView.viewID = Network.AllocateViewID();
+		anim.networkView.stateSynchronization = NetworkStateSynchronization.ReliableDeltaCompressed;
+		anim.networkView.observed = anim;
+		
+		networkView.RPC("SendUserView", RPCMode.OthersBuffered, unit.networkView.viewID, anim.networkView.viewID);
 		
 		return unit;
 	}
@@ -279,16 +281,17 @@ public class GameManager : MonoBehaviour {
 	[RPC]
 	public void SendUserView(NetworkViewID view, NetworkViewID animview) { // Any Side
 		GameObject unit = new GameObject("Player");
-		NetworkView nview = unit.AddComponent<NetworkView>();
-		nview.stateSynchronization = NetworkStateSynchronization.Unreliable;
-		nview.observed = unit.transform;
-		nview.viewID = view;
+		unit.AddComponent<NetworkView>();
+		unit.networkView.stateSynchronization = NetworkStateSynchronization.Unreliable;
+		unit.networkView.observed = unit.transform;
+		unit.networkView.viewID = view;
 		
 		unit.AddComponent<Dummy>().Init();
-		nview = unit.AddComponent<NetworkView>();
-		nview.stateSynchronization = NetworkStateSynchronization.ReliableDeltaCompressed;
-		nview.observed = unit.GetComponentInChildren<Animator>();
-		nview.viewID = view;
+		Animator anim = unit.GetComponentInChildren<Animator>();
+		anim.gameObject.AddComponent<NetworkView>();
+		anim.networkView.stateSynchronization = NetworkStateSynchronization.ReliableDeltaCompressed;
+		anim.networkView.observed = anim;
+		anim.networkView.viewID = view;
 	}
 	[RPC]
 	public void SendGameStart(bool hunter, int spawn) { // Client Side
